@@ -1,5 +1,7 @@
 
-include_recipe "mysql::server"
+require_recipe "apache2"
+require_recipe "apache2::mod_php5"
+require_recipe "mysql::server"
 
 node.set_unless['omeka']['mysql_user']     = 'omeka'
 node.set_unless['omeka']['mysql_password'] = 'omeka'
