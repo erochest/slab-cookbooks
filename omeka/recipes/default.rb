@@ -6,6 +6,7 @@ require_recipe "mysql::server"
 node.set_unless['omeka']['mysql_user']     = 'omeka'
 node.set_unless['omeka']['mysql_password'] = 'omeka'
 node.set_unless['omeka']['mysql_db']       = 'omeka'
+node.set_unless['omeka']['omeka_dir']      = '/vagrant/omeka'
 
 mysql_database "create-omeka-user" do
   host      "localhost"
@@ -23,5 +24,13 @@ mysql_database "create-omeka-db" do
   database  "mysql"
   sql       "CREATE DATABASE #{node['omeka']['mysql_db']} CHARACTER SET = 'utf8' COLLATE = 'utf8_unicode_ci';"
   action    :query
+end
+
+template "#{node[:apache][:dir]}/sites-available/default" do
+  source "default-site.erb"
+  owner "root"
+  group "root"
+  mode 0644
+  notifies :restart, resources(:service => "apache2")
 end
 
