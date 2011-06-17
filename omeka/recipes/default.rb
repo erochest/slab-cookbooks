@@ -1,20 +1,26 @@
 
 require_recipe "apache2"
 require_recipe "apache2::mod_php5"
+require_recipe "apache2::mod_rewrite"
+require_recipe "php"
 require_recipe "mysql::server"
+require_recipe "imagemagick"
 
-node.set_unless['omeka']['mysql_user']     = 'omeka'
-node.set_unless['omeka']['mysql_password'] = 'omeka'
-node.set_unless['omeka']['mysql_db']       = 'omeka'
-node.set_unless['omeka']['omeka_dir']      = '/vagrant/omeka'
+node.set_unless[:omeka][:mysql_user]     = 'omeka'
+node.set_unless[:omeka][:mysql_password] = 'omeka'
+node.set_unless[:omeka][:mysql_db]       = 'omeka'
+node.set_unless[:omeka][:omeka_dir]      = '/vagrant/omeka'
+node.set_unless[:omeka][:host_port]      = node[:vagrant][:config][:vm][:forwarded_ports][:apache2][:hostport]
+node.set_unless[:omeka][:guest_port]     = node[:vagrant][:config][:vm][:forwarded_ports][:apache2][:guestport]
+node.set_unless[:omeka][:omeka_dir]      = '/vagrant/omeka'
 
-mysql_database "create-omeka-user" do
-  host      "localhost"
-  username  "root"
-  password  node['mysql']['server_root_password']
-  database  "mysql"
-  sql       "GRANT ALL ON #{node['omeka']['mysql_db']}.* TO '#{node['omeka']['mysql_user']}'@'%' IDENTIFIED BY '#{node['omeka']['mysql_password']}';"
-  action    :query
+pkg = value_for_platform(
+    [ "centos", "redhat", "fedora" ] => {"default" => "php53-mysql"}, 
+    "default" => "php5-mysql"
+  )
+
+package pkg do
+  action :install
 end
 
 mysql_database "create-omeka-db" do
@@ -22,7 +28,43 @@ mysql_database "create-omeka-db" do
   username  "root"
   password  node['mysql']['server_root_password']
   database  "mysql"
-  sql       "CREATE DATABASE #{node['omeka']['mysql_db']} CHARACTER SET = 'utf8' COLLATE = 'utf8_unicode_ci';"
+  sql       "CREATE DATABASE #{node[:omeka]['mysql_db']} CHARACTER SET = 'utf8' COLLATE = 'utf8_unicode_ci';"
+  action    :query
+end
+
+mysql_database "create-omeka-user-local" do
+  host      "localhost"
+  username  "root"
+  password  node['mysql']['server_root_password']
+  database  "mysql"
+  sql       "CREATE USER '#{node[:omeka][:mysql_user]}'@'localhost' IDENTIFIED BY '#{node[:omeka][:mysql_password]}';"
+  action    :query
+end
+
+mysql_database "create-omeka-user-remote" do
+  host      "localhost"
+  username  "root"
+  password  node['mysql']['server_root_password']
+  database  "mysql"
+  sql       "CREATE USER '#{node[:omeka][:mysql_user]}'@'%' IDENTIFIED BY '#{node[:omeka][:mysql_password]}';"
+  action    :query
+end
+
+mysql_database "grant-omeka-user-local" do
+  host      "localhost"
+  username  "root"
+  password  node['mysql']['server_root_password']
+  database  "mysql"
+  sql       "GRANT ALL PRIVILEGES ON #{node[:omeka][:mysql_db]}.* TO '#{node[:omeka][:mysql_user]}'@'localhost';"
+  action    :query
+end
+
+mysql_database "grant-omeka-user-remote" do
+  host      "localhost"
+  username  "root"
+  password  node['mysql']['server_root_password']
+  database  "mysql"
+  sql       "GRANT ALL PRIVILEGES ON #{node[:omeka][:mysql_db]}.* TO '#{node[:omeka][:mysql_user]}'@'%';"
   action    :query
 end
 
@@ -32,5 +74,10 @@ template "#{node[:apache][:dir]}/sites-available/default" do
   group "root"
   mode 0644
   notifies :restart, resources(:service => "apache2")
+end
+
+cookbook_file "#{node[:omeka][:omeka_dir]}/application/models/Installer/Requirements.php" do
+  source "Requirements.php"
+  mode 0644
 end
 

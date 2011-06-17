@@ -1,0 +1,54 @@
+<VirtualHost *:80>
+        ServerAdmin <%= node[:apache][:contact] %>
+
+        DocumentRoot <%= node[:omeka][:omeka_dir] %>
+        <Directory />
+                Options FollowSymLinks
+                AllowOverride All
+        </Directory>
+        <Directory <%= node[:omeka][:omeka_dir] %>/>
+                Options Indexes FollowSymLinks MultiViews
+                AllowOverride All
+                Order allow,deny
+                allow from all
+        </Directory>
+
+        ScriptAlias /cgi-bin/ <%= node[:omeka][:omeka_dir] %>/cgi-bin/
+        <Directory "<%= node[:omeka][:omeka_dir] %>/cgi-bin">
+                AllowOverride None
+                Options ExecCGI -MultiViews +SymLinksIfOwnerMatch
+                Order allow,deny
+                Allow from all
+        </Directory>
+
+        ErrorLog <%= node[:apache][:log_dir] %>/error.log 
+
+        # Possible values include: debug, info, notice, warn, error, crit,
+        # alert, emerg.
+        LogLevel warn
+
+        CustomLog <%= node[:apache][:log_dir] %>/access.log combined
+        ServerSignature On
+
+        Alias /doc/ "/usr/share/doc/"
+        <Directory "/usr/share/doc/">
+            Options Indexes MultiViews FollowSymLinks
+            AllowOverride None
+            Order deny,allow
+            Deny from all
+            Allow from 127.0.0.0/255.0.0.0 ::1/128
+        </Directory>
+
+        <% if node[:platform] == "centos" || node[:platform] == "redhat" || node[:platform] == "fedora" -%>
+        #
+        # This configuration file enables the default "Welcome"
+        # page if there is no default index page present for
+        # the root URL.  To disable the Welcome page, comment
+        # out all the lines below.
+        #
+        <LocationMatch "^/+$">
+            Options -Indexes
+            ErrorDocument 403 /error/noindex.html
+        </LocationMatch>
+        <% end -%>
+</VirtualHost>
