@@ -10,9 +10,6 @@ node.set_unless[:omeka][:mysql_user]     = 'omeka'
 node.set_unless[:omeka][:mysql_password] = 'omeka'
 node.set_unless[:omeka][:mysql_db]       = 'omeka'
 node.set_unless[:omeka][:omeka_dir]      = '/vagrant/omeka'
-node.set_unless[:omeka][:host_port]      = node[:vagrant][:config][:vm][:forwarded_ports][:apache2][:hostport]
-node.set_unless[:omeka][:guest_port]     = node[:vagrant][:config][:vm][:forwarded_ports][:apache2][:guestport]
-node.set_unless[:omeka][:omeka_dir]      = '/vagrant/omeka'
 
 pkg = value_for_platform(
     [ "centos", "redhat", "fedora" ] => {"default" => "php53-mysql"}, 
