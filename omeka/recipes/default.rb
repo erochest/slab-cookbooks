@@ -9,6 +9,7 @@ require_recipe "imagemagick"
 node.set_unless[:omeka][:mysql_user]     = 'omeka'
 node.set_unless[:omeka][:mysql_password] = 'omeka'
 node.set_unless[:omeka][:mysql_db]       = 'omeka'
+node.set_unless[:omeka][:mysql_prefix]   = 'omeka_'
 node.set_unless[:omeka][:omeka_dir]      = '/vagrant/omeka'
 
 pkg = value_for_platform(
@@ -71,6 +72,13 @@ template "#{node[:apache][:dir]}/sites-available/default" do
   group "root"
   mode 0644
   notifies :restart, resources(:service => "apache2")
+end
+
+template "#{node[:omeka][:omeka_dir]}/db.ini" do
+  source "db.ini.erb"
+  owner "root"
+  group "root"
+  mode 0644
 end
 
 cookbook_file "#{node[:omeka][:omeka_dir]}/application/models/Installer/Requirements.php" do
