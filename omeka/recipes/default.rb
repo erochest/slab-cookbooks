@@ -13,13 +13,20 @@ node.set_unless[:omeka][:mysql_prefix]   = 'omeka_'
 node.set_unless[:omeka][:omeka_dir]      = '/vagrant/omeka'
 
 # Set up the PHP MySQL package.
-pkg = value_for_platform(
+mysql_pkg = value_for_platform(
     [ "centos", "redhat", "fedora" ] => {"default" => "php53-mysql"}, 
     "default" => "php5-mysql"
   )
 
-package pkg do
+package mysql_pkg do
   action :install
+end
+
+case node.platform
+when "centos"
+  package "php53-xml" do
+    action :install
+  end
 end
 
 # Set up the Omeka database.
@@ -89,5 +96,32 @@ end
 cookbook_file "#{node[:omeka][:omeka_dir]}/application/models/Installer/Requirements.php" do
   source "Requirements.php"
   mode 0644
+end
+
+# Set up PHP packages.
+php_pear_channel "pear.php.net" do
+  action :update
+end
+
+phpunit = php_pear_channel "pear.phpunit.de" do
+  action :discover
+end
+
+php_pear_channel "components.ez.no" do
+  action :discover
+end
+
+php_pear_channel "pear.symfony-project.com" do
+  action :discover
+end
+
+php_pear "PEAR" do
+  action    :upgrade
+  options   "--force"
+end
+
+php_pear "PHPUnit" do
+  channel        phpunit.channel_name
+  action         :install
 end
 
