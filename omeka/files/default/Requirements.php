@@ -1,7 +1,7 @@
 <?php
 /**
  * @version $Id$
- * @copyright Center for History and New Media, 2009
+ * @copyright Roy Rosenzweig Center for History and New Media, 2009
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @package Omeka
  * @access private
@@ -11,7 +11,7 @@
  * @internal This implements Omeka internals and is not part of the public API.
  * @access private
  * @package Omeka
- * @copyright Center for History and New Media, 2009
+ * @copyright Roy Rosenzweig Center for History and New Media, 2009
  **/
 class Installer_Requirements
 {
@@ -19,6 +19,7 @@ class Installer_Requirements
     const OMEKA_MYSQL_VERSION = '5.0';
     
     private $_dbAdapter;
+    private $_storage;
     
     private $_errorMessages = array();
     private $_warningMessages = array();
@@ -32,7 +33,8 @@ class Installer_Requirements
         $this->_checkRegisterGlobalsIsOff();
         $this->_checkExifModuleIsLoaded();
         // $this->_checkModRewriteIsEnabled();
-        $this->_checkArchiveDirectoriesAreWritable();
+        $this->_checkArchiveStorageSetup();
+        $this->_checkFileinfoIsLoaded();
     }
     
     public function getErrorMessages()
@@ -58,6 +60,11 @@ class Installer_Requirements
     public function setDbAdapter(Zend_Db_Adapter_Abstract $db)
     {
         $this->_dbAdapter = $db;
+    }
+
+    public function setStorage(Omeka_Storage $storage)
+    {
+        $this->_storage = $storage;
     }
     
     private function _checkPhpVersionIsValid()
@@ -98,17 +105,10 @@ class Installer_Requirements
     
     private function _checkHtaccessFilesExist()
     {
-        if (!file_exists(BASE_DIR . DIRECTORY_SEPARATOR . '.htaccess')) {
+        if (!file_exists(BASE_DIR . '/.htaccess')) {
             $header = 'Missing .htaccess File';
             $message = "Omeka's .htaccess file is missing. Please make sure this 
             file has been uploaded correctly and try again.";
-            $this->_errorMessages[] = compact('header', 'message');
-        }
-        
-        if (!file_exists(ADMIN_DIR . DIRECTORY_SEPARATOR . '.htaccess')) {
-            $header = 'Missing admin/.htaccess File';
-            $message = "Omeka's admin/.htaccess file is missing. Please make 
-            sure this file has been uploaded correctly and try again.";
             $this->_errorMessages[] = compact('header', 'message');
         }
     }
@@ -171,18 +171,33 @@ class Installer_Requirements
         }
     }
     
-    private function _checkArchiveDirectoriesAreWritable()
+    private function _checkArchiveStorageSetup()
     {
-        $archiveDirectories = array(ARCHIVE_DIR, FILES_DIR, FULLSIZE_DIR, 
-                                    THUMBNAIL_DIR, SQUARE_THUMBNAIL_DIR);
-        foreach ($archiveDirectories as $archiveDirectory) {
-            if (!is_writable($archiveDirectory)) {
-                $header = 'Archive directory not writable';
-                $message = "The following directory must be writable by your web 
-                server before installing Omeka: $archiveDirectory";
+        if (!$this->_storage->canStore()) {
+            try {
+                $this->_storage->setUp();
+            } catch (Omeka_Storage_Exception $e) {
+                $header = 'Archive storage not set up properly.';
+                $exMessage = $e->getMessage();
+                $message = "The following error occurred when attempting to "
+                    . "set up storage for your Omeka site: $exMessage  "
+                    . "Please ensure that all storage directories exist and "
+                    . "are writable by your web server.";
                 $this->_errorMessages[] = compact('header', 'message');
             }
         }
     }
     
+    private function _checkFileinfoIsLoaded()
+    {
+        if (!extension_loaded('fileinfo')) {
+            $header = '"fileinfo" module not loaded';
+            $message = "Without the "
+                     . "<a href=\"http://php.net/manual/en/book.fileinfo.php\"> "
+                     . "fileinfo module</a> loaded into PHP, the content type "
+                     . "and encoding of uploaded files about cannot be read. "
+                     . "The installer will disable file upload validation.";
+            $this->_warningMessages[] = compact('header', 'message');
+        }
+    }
 }
