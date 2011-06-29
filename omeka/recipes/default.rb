@@ -115,13 +115,37 @@ php_pear_channel "pear.symfony-project.com" do
   action :discover
 end
 
+phpmd = php_pear_channel "pear.phpmd.org" do
+  action :discover
+end
+
+php_pear_channel "pear.pdepend.org" do
+  action :discover
+end
+
 php_pear "PEAR" do
   action    :upgrade
   options   "--force"
 end
 
-php_pear "PHPUnit" do
-  channel        phpunit.channel_name
-  action         :install
+php_pear "PhpDocumentor" do
+  action :install
 end
+
+php_pear "PHPUnit" do
+  channel   phpunit.channel_name
+  action    :install
+end
+
+php_pear "phpcpd" do
+  channel   phpunit.channel_name
+  action    :install
+end
+
+php_pear "PHP_PMD" do
+  channel   phpmd.channel_name
+  version   "alpha"
+  action    :install
+end
+
 
