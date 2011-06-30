@@ -1,0 +1,61 @@
+
+# Description
+
+This installs and configures an Omeka instance.
+
+# Requirements
+
+## Platform
+
+ * CentOS
+
+This will probably work with other platforms, too, but I haven't tested them.
+
+## Cookbooks
+
+From https://github.com/opscode/cookbooks:
+
+ * apache2
+ * php
+ * mysql
+ * imagemagick
+
+# Attributes
+
+ * `node[:omeka][:mysql_user]` — The MySQL user to create to access the Omeka
+   database. This defaults to "omeka".
+ * `node[:omeka][:mysql_password]` — The password for
+   `node[:omeka][:mysql_user]`. This also defaults to "omeka".
+ * `node[:omeka][:mysql_db]` — The database to create for the Omeka site. This
+   defaults to "omeka".
+ * `node[:omeka][:mysql_prefix]` — The prefix for Omeka put on its tables in
+   the database. This default to "omeka_".
+ * `node[:omeka][:omeka_dir]` — The directory in the VM that contains the Omeka
+   instance. This defaults to "/vagrant/omeka".
+ * `node[:omeka][:test_user]` — The MySQL user to create for the test Omeka
+   database. This defaults to "omeka".
+ * `node[:omeka][:test_password]` — The password for
+   `node[:omeka][:test_user]`. This also defaults to "omeka".
+ * `node[:omeka][:mysql_db]` — The database to create for running unit tests on
+   the Omeka site. This defaults to "omeka".
+
+# Installed
+
+This recipe installs these systems:
+
+ * Apache
+ * PHP
+ * MySQL
+ * ImageMagick
+
+It also installs a number of utilities for working with PHP code:
+
+ * [PhpDocumentor](http://www.phpdoc.org/)
+ * [PHPUnit](https://github.com/sebastianbergmann/phpunit/)
+ * [phpcpd](https://github.com/sebastianbergmann/phpcpd/)
+ * [PHP_PMD](http://phpmd.org/)
+ * [PHP_CodeSniffer](http://pear.php.net/package/PHP_CodeSniffer/redirected)
+ * [Xdebug](http://xdebug.org/)
+
+# License and Author
+

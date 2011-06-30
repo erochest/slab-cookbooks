@@ -145,5 +145,3 @@ You can use the Rakefile by copying it into your Vagrant project directory. Or
 better yet, create a link to it from that directory or import it into a
 Rakefile in that directory.
 
-## Omeka Recipe
-
