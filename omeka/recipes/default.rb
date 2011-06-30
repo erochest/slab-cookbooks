@@ -6,16 +6,6 @@ require_recipe "php"
 require_recipe "mysql::server"
 require_recipe "imagemagick"
 
-node.set_unless[:omeka][:mysql_user]     = 'omeka'
-node.set_unless[:omeka][:mysql_password] = 'omeka'
-node.set_unless[:omeka][:mysql_db]       = 'omeka'
-node.set_unless[:omeka][:mysql_prefix]   = 'omeka_'
-node.set_unless[:omeka][:omeka_dir]      = '/vagrant/omeka'
-
-node.set_unless[:omeka][:test_user]      = node[:omeka][:mysql_user]
-node.set_unless[:omeka][:test_password]  = node[:omeka][:mysql_password]
-node.set_unless[:omeka][:test_db]        = node[:omeka][:mysql_db]
-
 # Set up the PHP MySQL package.
 mysql_pkg = value_for_platform(
     [ "centos", "redhat", "fedora" ] => {"default" => "php53-mysql"}, 
