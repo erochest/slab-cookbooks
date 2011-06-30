@@ -96,12 +96,25 @@ task :pdepend do
   env = Vagrant::Environment.new
 
   base_dir = ENV['base_dir'] || '/vagrant/omeka'
-  output_dir = ENV['output_dir'] || '/vagrant/phpmd'
+  output_dir = ENV['output_dir'] || '/vagrant/pdepend'
 
   cmd = "pdepend --jdepend-xml=#{output_dir}/jdepend.xml " +
         "--jdepend-chart=#{output_dir}/dependencies.svg " +
         "--overview-pyramid=#{output_dir}/overview-pyramid.svg " +
         "#{base_dir}"
+  run_cmd(env, cmd, output_dir)
+end
+
+desc 'Generate a PHP Copy/Paste Detection report.
+  base_dir    The directory to analyze.
+  output_dir  The output directory.'
+task :phpcpd do
+  env = Vagrant::Environment.new
+
+  base_dir = ENV['base_dir'] || '/vagrant/omeka'
+  output_dir = ENV['output_dir'] || '/vagrant/phpcpd'
+
+  cmd = "phpcpd --log-pmd #{output_dir}/pmd-cpd.xml #{base_dir}"
   run_cmd(env, cmd, output_dir)
 end
 
