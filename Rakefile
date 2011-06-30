@@ -1,6 +1,21 @@
 
 require 'vagrant'
 
+def run_cmd(env, cmd, output_dir)
+  p cmd
+
+  env.primary_vm.ssh.execute do |ssh|
+    if output_dir != nil
+      ssh.exec!("if [ ! -d #{output_dir} ] ; then mkdir -p #{output_dir} ; fi")
+    end
+    ssh.exec!(cmd) do |channel, stream, data|
+      puts data
+    end
+  end
+
+end
+
+
 desc 'Run phpunit on a PHP file.
   base_dir    The directory on the VM to run the phpunit in.
   phpunit_xml The phpunit.xml relative to base_dir to configure the phpunit
@@ -26,20 +41,14 @@ task :phpunit do
     opts << " -c #{phpunit_xml}"
   end
   if coverage != nil
-    directory coverage
     opts << " --coverage-html #{coverage}"
   end
   if target != nil
     opts << " #{target}"
   end
 
-  env.primary_vm.ssh.execute do |ssh|
-    cmd = "cd #{base_dir} && phpunit#{opts}"
-    p cmd
-    ssh.exec!(cmd) do |channel, stream, data|
-      puts data
-    end
-  end
+  cmd = "cd #{base_dir} && phpunit#{opts}"
+  run_cmd(env, cmd, coverage)
 end
 
 desc 'Run phpdoc in a directory.
@@ -56,13 +65,9 @@ task :phpdoc do
   base_dir = ENV['base_dir'] || '/vagrant/omeka'
   output_dir = ENV['output_dir'] || '/vagrant/docs'
 
-  env.primary_vm.ssh.execute do |ssh|
-    cmd = "phpdoc -o HTML:frames:earthli -d #{base_dir} -t #{output_dir} -i tests/,dist/,build/"
-    p cmd
-    ssh.exec!(cmd) do |channel, stream, data|
-      puts data
-    end
-  end
+  cmd = "phpdoc -o HTML:frames:earthli -d #{base_dir} -t #{output_dir} " +
+        "-i tests/,dist/,build/"
+  run_cmd(env, cmd, output_dir)
 end
 
 desc 'Run PHP Mess Detector in a directory.
@@ -79,13 +84,24 @@ task :phpmd do
   base_dir = ENV['base_dir'] || '/vagrant/omeka'
   output_dir = ENV['output_dir'] || '/vagrant/phpmd'
 
-  env.primary_vm.ssh.execute do |ssh|
-    cmd = "phpmd #{base_dir} html codesize,design,naming,unusedcode --reportfile #{output_dir}/index.html"
-    p cmd
-    ssh.exec!("if [ ! -d #{output_dir} ] ; then mkdir -p #{output_dir} ; fi")
-    ssh.exec!(cmd) do |channel, stream, data|
-      puts data
-    end
-  end
+  cmd = "phpmd #{base_dir} html codesize,design,naming,unusedcode " +
+        "--reportfile #{output_dir}/index.html"
+  run_cmd(env, cmd, output_dir)
+end
+
+desc 'Create PHP_Depend static code analysis report.
+  base_dir    The directory to analyze.
+  output_dir  The output directory.'
+task :pdepend do
+  env = Vagrant::Environment.new
+
+  base_dir = ENV['base_dir'] || '/vagrant/omeka'
+  output_dir = ENV['output_dir'] || '/vagrant/phpmd'
+
+  cmd = "pdepend --jdepend-xml=#{output_dir}/jdepend.xml " +
+        "--jdepend-chart=#{output_dir}/dependencies.svg " +
+        "--overview-pyramid=#{output_dir}/overview-pyramid.svg " +
+        "#{base_dir}"
+  run_cmd(env, cmd, output_dir)
 end
 
