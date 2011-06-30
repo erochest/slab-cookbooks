@@ -56,11 +56,33 @@ task :phpdoc do
   base_dir = ENV['base_dir'] || '/vagrant/omeka'
   output_dir = ENV['output_dir'] || '/vagrant/docs'
 
-  directory output_dir
-
   env.primary_vm.ssh.execute do |ssh|
     cmd = "phpdoc -o HTML:frames:earthli -d #{base_dir} -t #{output_dir} -i tests/,dist/,build/"
     p cmd
+    ssh.exec!(cmd) do |channel, stream, data|
+      puts data
+    end
+  end
+end
+
+desc 'Run PHP Mess Detector in a directory.
+  base_dir    The directory to run phpmd from.
+  output_dir  The output directory.
+
+Example:
+  rake phpmd base_dir=/vagrant/site-name/plugins/BagIt \
+             output_dir=/vagrant/phpmd'
+
+task :phpmd do
+  env = Vagrant::Environment.new
+
+  base_dir = ENV['base_dir'] || '/vagrant/omeka'
+  output_dir = ENV['output_dir'] || '/vagrant/phpmd'
+
+  env.primary_vm.ssh.execute do |ssh|
+    cmd = "phpmd #{base_dir} html codesize,design,naming,unusedcode --reportfile #{output_dir}/index.html"
+    p cmd
+    ssh.exec!("if [ ! -d #{output_dir} ] ; then mkdir -p #{output_dir} ; fi")
     ssh.exec!(cmd) do |channel, stream, data|
       puts data
     end
