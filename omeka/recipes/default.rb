@@ -220,6 +220,11 @@ php_pear "PHP_PMD" do
   action    :install
 end
 
+php_pear "PHP_CodeSniffer" do
+  version  "1.3.0a1"
+  action   :install
+end
+
 script "pecl/xdebug" do
   # OMG, this seems more painful than necessary. There's no php53-* package for
   # CentOS, and just a simple 'pecl install' doesn't work either.

@@ -118,3 +118,23 @@ task :phpcpd do
   run_cmd(env, cmd, output_dir)
 end
 
+desc 'Generate a PHP_CodeSniffer report for coding standards.
+  base_dir    The directory to analyze.
+  output_dir  The output directory.
+  standard    The standard to check against (default is Zend).'
+task :phpcs do
+  env = Vagrant::Environment.new
+
+  base_dir = ENV['base_dir'] || '/vagrant/omeka'
+  output_dir = ENV['output_dir'] || '/vagrant/phpcs'
+  standard = ENV['standard'] || 'Zend'
+
+  cmd = "phpcs --report=checkstyle " +
+        "--extensions=php " +
+        "--ignore=*/tests/* " +
+        "--report-file=#{output_dir}/checkstyle.xml " +
+        "--standard=#{standard} " +
+        "#{base_dir}"
+  run_cmd(env, cmd, output_dir)
+end
+
