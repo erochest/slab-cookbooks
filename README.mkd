@@ -71,12 +71,12 @@ These commands will download the latest version of Omeka (as of the time I'm
 writing this) and change permissions on the archive directory so the web server
 can write to it.
 
-[sourcecode language="bash"]
-curl -O http://omeka.org/files/omeka-1.3.2.zip
-unzip omeka-1.3.2.zip
-mv omeka-1.3.2 omeka
+```bash
+curl -O http://omeka.org/files/omeka-1.4.zip
+unzip omeka-1.4.zip
+mv omeka-1.4 omeka
 chmod -R a+rwx omeka/archive/
-[/sourcecode]
+```
 
 ### Start the VM
 
