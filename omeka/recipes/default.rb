@@ -200,8 +200,13 @@ php_pear "PhpDocumentor" do
 end
 
 php_pear "PHPUnit" do
-  channel   phpunit.channel_name
-  action    :install
+  channel          phpunit.channel_name
+
+  # Have to change perferred state here because XML_RPC2 now requires
+  # HTTP_Request2, which has no stable releases.
+  preferred_state  "beta"
+
+  action           :install
 end
 
 php_pear "phpcpd" do
@@ -213,6 +218,28 @@ php_pear "PHP_PMD" do
   channel   phpmd.channel_name
   version   "alpha"
   action    :install
+end
+
+script "pecl/xdebug" do
+  # OMG, this seems more painful than necessary. There's no php53-* package for
+  # CentOS, and just a simple 'pecl install' doesn't work either.
+
+  interpreter "bash"
+  user "root"
+  cwd "/tmp"
+
+  code <<-EOH
+  mkdir xdebug-install
+  cd xdebug-install
+  pecl download xdebug
+  tar xfz *.tgz
+  cd $(find . -type d -and -name 'xdebug*')
+  phpize
+  ./configure
+  make
+  make install
+  echo 'zend_extension="/usr/lib/php/modules/xdebug.so"' > /etc/php.d/xdebug.ini
+  EOH
 end
 
 
