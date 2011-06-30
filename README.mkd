@@ -1,0 +1,149 @@
+
+# Scholars' Lab Chef Cookbook and Vagrant Utilities
+
+This is a collection of [Chef Solo](http://www.opscode.com/chef/) recipes that
+we've accumulated at the [Scholars' Lab](http://www.scholarslab.org/) to use
+with [Vagrant](http://vagrantup.com/). At the moment, the primary recipe is to
+set up an Omeka installation for developing either on Omeka or on plugins or
+themes. This also has a Rakefile that makes testing and working with PHP code
+in the Vagrant VM easier.
+
+## Installation and Use
+
+### Installing Vagrant and VirtualBox
+
+Vagrant's written in Ruby, so assuming you have Ruby and RubyGems installed, just do this:
+
+```bash
+gem install vagrant
+```
+
+Getting VirtualBox is more complicated. Check [the VirtualBox
+website](http://www.virtualbox.org/) for how to install it.
+
+### Set up a Working Directory
+
+Once the software is installed, you'll need to set up a working directory and
+initialize it for Vagrant. You'll also need to download the Chef cookbooks that
+you'll use.
+
+```bash
+mkdir omeka-project
+cd omeka-project
+git clone https://github.com/opscode/cookbooks.git
+git clone git://github.com/scholarslab/cookbooks.git slab-cookbooks
+vagrant init omeka-project PATH-TO/base-centos32.box
+```
+
+The last command created a file called "Vagrantfile". (It also pointed to a
+file that won't exist on your system. We're working on a URL for hosting the
+base box. When it's available, use that URL in place of PATH-TO.) Go ahead and
+open it up in your favorite text editor. Vagrantfile is just Ruby, nothing
+scary there. We need to add a few lines. At the bottom of the file, just before
+the "end," insert these:
+
+  **Note**: the base-centos32.box isn't publicly available at the moment.
+  Theoretically, this should work with any system, but I haven't tested it.
+
+```ruby
+config.vm.provision :chef_solo do |chef|
+  chef.cookbooks_path = ["cookbooks", "slab-cookbooks"]
+  chef.add_recipe "omeka"
+end
+config.vm.forward_port('mysql', 3306, 3333)
+config.vm.forward_port('apache2', 80, 8080)
+```
+
+The first four lines tell Vagrant to set up the system using [Chef
+Solo](http://www.opscode.com/chef/), and they tell Chef to use the cookbooks we
+downloaded from GitHub and to use the "omeka" recipe. The last two lines tell
+Vagrant to set up port forwarding so we can access the web server and database
+from the host machine, without needing to log onto the VM.
+
+<h4>Set up Omeka</h4>
+
+Now we're ready to set up Omeka. By default, the system assumes that your Omeka
+code is in a subdirectory of your working directory and that it is named
+"omeka." (This &mdash; and many other things &mdash; are configurable, but
+that's beyond the scope of this post.)
+
+These commands will download the latest version of Omeka (as of the time I'm
+writing this) and change permissions on the archive directory so the web server
+can write to it.
+
+[sourcecode language="bash"]
+curl -O http://omeka.org/files/omeka-1.3.2.zip
+unzip omeka-1.3.2.zip
+mv omeka-1.3.2 omeka
+chmod -R a+rwx omeka/archive/
+[/sourcecode]
+
+### Start the VM
+
+Everything's in place. Now it's time to start the VM. From the console, just
+enter this command:
+
+```bash
+vagrant up
+```
+
+A lot of lines will scroll by. Many minutes will pass. Apache, PHP, and MySQL
+will be installed. When you get your prompt back, you should be ready to go.
+
+You probably missed it, but these lines were near the beginning of all that
+output:
+
+```
+[default] -- mysql: 3306 => 3333 (adapter 1)
+[default] -- apache2: 80 => 8080 (adapter 1)
+[default] -- ssh: 22 => 2222 (adapter 1)
+```
+
+These tell how you can communicate with your newly minted VM. Since it's using
+port forwarding, you can pretend like you're talking to your host box, but
+using the ports listed above:
+
+```bash
+mysql -uomeka -pomeka --protocol=TCP --port=3333 omeka
+open http://localhost:8080/
+vagrant ssh
+```
+
+### Finishing the Omeka Installation
+
+Now you need to finish setting up Omeka. Just point your browser to
+http://localhost:8080 running on the VM and fill in the installation
+information like you normally would. Nothing special here.
+
+### Developing
+
+The Omeka code running the site is on your host machine, in the omeka/
+directory that you created above. You can put the plugins and themes that you
+want to use into there, and you can edit them as you like.
+
+### Closing Down
+
+When you're done for the day and you want your resources back, you can just
+suspend the VM by calling this:
+
+```bash
+vagrant suspend
+```
+
+When you're done with the project and you want to destroy the VM, the database,
+and everything on it, give this command:
+
+```bash
+vagrant destroy
+```
+
+### 
+
+## Rakefile
+
+You can use the Rakefile by copying it into your Vagrant project directory. Or
+better yet, create a link to it from that directory or import it into a
+Rakefile in that directory.
+
+## Omeka Recipe
+
