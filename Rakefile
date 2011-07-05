@@ -73,12 +73,7 @@ end
 
 desc 'Run PHP Mess Detector in a directory.
   base_dir    The directory to run phpmd from.
-  output_dir  The output directory.
-
-Example:
-  rake phpmd base_dir=/vagrant/site-name/plugins/BagIt \
-             output_dir=/vagrant/phpmd'
-
+  output_dir  The output directory.'
 task :phpmd do
   env = Vagrant::Environment.new
 
