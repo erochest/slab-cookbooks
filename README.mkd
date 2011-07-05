@@ -154,7 +154,7 @@ target does, the command-line arguments each accepts, and sample usage:
 This runs [phpunit](https://github.com/sebastianbergmann/phpunit/) on a file.
 
  * **base_dir** — The directory to run phpunit in.
- * **phpunit_xml* — The phpunit.xml file relative to base_dir to configure the
+ * **phpunit_xml** — The phpunit.xml file relative to base_dir to configure the
    run.
  * **target** — The class or PHP file relative to base_dir to run the tests on.
  * **coverage** — The directory to put the HTML coverage reports into.
