@@ -140,8 +140,96 @@ vagrant destroy
 ## Rakefile
 
 You can use the Rakefile by copying it into your Vagrant project directory. Or
-better yet, create a link to it from that directory or import it into a
-Rakefile in that directory.
+better yet, create a link to it from that directory or import it a primary
+Rakefile in your project directory.
+
+> **Note**: Unless otherwise noted, all paths below are paths *on the VM*. That
+> is, `<project-directory>/subdir/` should be `/vagrant/subdir/`.
+
+Here are the targets defined in this Rakefile. This briefly describes what each
+target does, the command-line arguments each accepts, and sample usage:
+
+### rake phpunit
+
+This runs [phpunit](https://github.com/sebastianbergmann/phpunit/) on a file.
+
+ * **base_dir** — The directory to run phpunit in.
+ * **phpunit_xml* — The phpunit.xml file relative to base_dir to configure the
+   run.
+ * **target** — The class or PHP file relative to base_dir to run the tests on.
+ * **coverage** — The directory to put the HTML coverage reports into.
+
+Example:
+
+```bash
+rake phpunit base_dir=/vagrant/site/plugins/SimplePages/tests \
+             phpunit_xml=phpunit.xml \
+             target=AllTests.php
+```
+
+### rake phpdoc
+
+This runs [PHP Documentor](http://www.phpdoc.org/) on a directory.
+
+ * **base_dir** — The directory to run phpdoc in.
+ * **output_dir** — The output directory.
+
+```bash
+rake phpdoc base_dir=/vagrant/site/plugins/BagIt \
+            output_dir=/vagrant/docs
+```
+
+### rake phpmd
+
+This run [PHP Mess Detector](http://phpmd.org/) on a directory.
+
+ * **base_dir** — The directory to run phpmd in.
+ * **output_dir** — The output directory
+
+```bash
+rake phpmd base_dir=/vagrant/site/plugins/BagIt \
+           output_dir=/vagrant/phpmd
+```
+
+### rake pdepend
+
+Create a [PHP Depend](http://pdepend.org/) static code analysis report.
+
+ * **base_dir** — The directory to analyze.
+ * **output_dir** — The output directory.
+
+```bash
+rake pdepend base_dir=/vagrant/site/plugins/BagIt \
+             output_dir=/vagrant/pdepend
+```
+
+### rake phpcpd
+
+Generate a [PHP Copy/Paste
+Detection](https://github.com/sebastianbergmann/phpcpd/tree/master) report.
+
+ * **base_dir** — The directory to analyze.
+ * **output_dir** — The output directory.
+
+```base
+rake phpcpd base_dir=/vagrant/site/plugins/BagIt \
+            output_dir=/vagrant/phpcpd
+```
+
+### rake phpcs
+
+Generate a [PHP Code
+Sniffer](http://pear.php.net/package/PHP_CodeSniffer/redirected) report.
+
+ * **base_dir** — The directory to analyze.
+ * **output_dir** — The output directory.
+ * **standard** — The standard to check against (default is 'Zend').
+
+```bash
+rake phpcs base_dir=/vagrant/site/plugins/BagIt \
+           output_dir=/vagrant/phpcs \
+           standard=Zend
+```
 
 ## License
 

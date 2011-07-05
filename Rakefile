@@ -30,16 +30,10 @@ end
 
 desc 'Run phpunit on a PHP file.
   base_dir    The directory on the VM to run the phpunit in.
-  phpunit_xml The phpunit.xml relative to base_dir to configure the phpunit
-              run.
-  target      The class for PHP file relative to base_dir to run the tests on.
-  coverage    The directory in the VM to put the HTML coverage reports into.
-
-Example:
-  rake phpunit base_dir=/vagrant/site-name/plugins/SimplePages/tests \
-               phpunit_xml=phpunit.xml \
-               target=AllTests.php'
-
+  phpunit_xml The phpunit.xml file relative to base_dir to configure the
+              phpunit run.
+  target      The class or PHP file relative to base_dir to run the tests on.
+  coverage    The directory in the VM to put the HTML coverage reports into.'
 task :phpunit do
   env = Vagrant::Environment.new
 
@@ -65,12 +59,7 @@ end
 
 desc 'Run phpdoc in a directory.
   base_dir    The directory to run phpdoc from.
-  output_dir  The output directory.
-
-Example:
-  rake phpdoc base_dir=/vagrant/site-name/plugins/BagIt \
-              output_dir=/vagrant/docs'
-
+  output_dir  The output directory.'
 task :phpdoc do
   env = Vagrant::Environment.new
 
