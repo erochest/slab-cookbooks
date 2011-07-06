@@ -11,6 +11,8 @@
 # Copyright   2010 The Board and Visitors of the University of Virginia
 # License     http://www.apache.org/licenses/LICENSE-2.0.html Apache 2 License
 
+default[:omeka][:version]        = nil
+
 default[:omeka][:mysql_user]     = 'omeka'
 default[:omeka][:mysql_password] = 'omeka'
 default[:omeka][:mysql_db]       = 'omeka'

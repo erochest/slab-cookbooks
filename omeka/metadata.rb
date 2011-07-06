@@ -21,6 +21,7 @@ depends "apache2"
 depends "php"
 depends "mysql"
 depends "imagemagick"
+depends "git"
 
 %w{ centos }.each do |os|
   supports os

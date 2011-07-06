@@ -17,6 +17,9 @@ require_recipe "apache2::mod_rewrite"
 require_recipe "php"
 require_recipe "mysql::server"
 require_recipe "imagemagick"
+require_recipe "git"
+
+omeka_github = 'https://github.com/omeka/Omeka.git'
 
 # Set up the PHP MySQL package.
 mysql_pkg = value_for_platform(
@@ -136,13 +139,48 @@ if node[:omeka][:test_user] != node[:omeka][:mysql_user] or node[:omeka][:test_d
 
 end
 
-# Set up the site in Apache.
-template "#{node[:apache][:dir]}/sites-available/default" do
-  source "default-site.erb"
-  owner "root"
-  group "root"
-  mode 0644
-  notifies :restart, resources(:service => "apache2")
+## Set up Omeka
+# Download Omeka, maybe.
+if node[:omeka][:version] != nil then
+  omeka_version = node[:omeka][:version]
+  omeka_version = 'master' if omeka_version == 'HEAD'
+
+  # If on CentOS, we have to update the SSL certificates manually. Yum. Yeah.
+  if node.platform == 'centos'
+    script "update_ssl_certificates" do
+      interpreter "bash"
+      user "root"
+      cwd "/etc/pki/tls/certs"
+      code <<-EOH
+      if [ ! -d /root/backups/ ] ; then
+        mkdir -p /root/backups/
+      fi
+      mv ca-bundle.crt /root/backups/ca-bundle.crt
+      curl http://curl.haxx.se/ca/cacert.pem -o /etc/pki/tls/certs/ca-bundle.crt
+      EOH
+    end
+  end
+
+  if File.directory?(node[:omeka][:omeka_dir])
+    script "backup_existing_omeka_dir" do
+      interpreter "bash"
+      user "root"
+      cwd "/vagrant"
+      code "mv #{node[:omeka][:omeka_dir]} #{node[:omeka][:omeka_dir]}.bk"
+    end
+  end
+
+  if omeka_version =~ /^[\d\.]*$/ then
+    omeka_ref = "tags/" + omeka_version
+  else
+    omeka_ref = omeka_version
+  end
+
+  git node[:omeka][:omeka_dir] do
+    repository omeka_github
+    reference omeka_ref
+    action :checkout
+  end
 end
 
 # Create the Omeka DB settings file.
@@ -165,6 +203,16 @@ end
 cookbook_file "#{node[:omeka][:omeka_dir]}/application/models/Installer/Requirements.php" do
   source "Requirements.php"
   mode 0644
+end
+
+##
+# Set up the site in Apache.
+template "#{node[:apache][:dir]}/sites-available/default" do
+  source "default-site.erb"
+  owner "root"
+  group "root"
+  mode 0644
+  notifies :restart, resources(:service => "apache2")
 end
 
 # Set up PHP packages.
