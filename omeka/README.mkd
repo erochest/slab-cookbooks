@@ -23,9 +23,9 @@ From https://github.com/opscode/cookbooks:
 # Attributes
 
  * `node[:omeka][:version]` — If given, then this version of Omeka will be
-   check out of GitHub. This can be 'HEAD', 'master', a version number (e.g.,
-   '1.4.1'), or any branch in the repository. This will also check out the
-   plugins for that version. If not given, this doesn't download anything,
+   check out of GitHub. This can be 'HEAD', 'master', a version number tag
+   (e.g., '1.4.1'), or any branch in the repository. This will also check out
+   the plugins for that version. If not given, this doesn't download anything,
    because it assumes that you will take care of getting Omeka.
  * `node[:omeka][:mysql_user]` — The MySQL user to create to access the Omeka
    database. This defaults to "omeka".
