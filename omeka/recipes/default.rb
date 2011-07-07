@@ -19,7 +19,22 @@ require_recipe "mysql::server"
 require_recipe "imagemagick"
 require_recipe "git"
 
+require 'fileutils'
+
 omeka_github = 'https://github.com/omeka/Omeka.git'
+
+# This reads lines from from_file, passes to a block, and writes the block's
+# output to to_file.
+module OmekaUtils
+  def OmekaUtils.sed(from_file, to_file)
+    File.open(to_file, 'w') do |output|
+      File.open(from_file).each do |line|
+        line = yield line
+        output.puts(line)
+      end
+    end
+  end
+end
 
 # Set up the PHP MySQL package.
 mysql_pkg = value_for_platform(
@@ -48,14 +63,15 @@ mysql_database "create-omeka-db" do
   action    :query
 end
 
-if node[:omeka][:test_db] != node[:omeka][:mysql_db]
-  mysql_database "create-omeka-test-db" do
-    host      "localhost"
-    username  "root"
-    password  node['mysql']['server_root_password']
-    database  "mysql"
-    sql       "CREATE DATABASE #{node[:omeka][:test_db]} CHARACTER SET = 'utf8' COLLATE = 'utf8_unicode_ci';"
-    action    :query
+mysql_database "create-omeka-test-db" do
+  host      "localhost"
+  username  "root"
+  password  node['mysql']['server_root_password']
+  database  "mysql"
+  sql       "CREATE DATABASE #{node[:omeka][:test_db]} CHARACTER SET = 'utf8' COLLATE = 'utf8_unicode_ci';"
+  action    :query
+  only_if do
+    node[:omeka][:test_db] != node[:omeka][:mysql_db]
   end
 end
 
@@ -95,48 +111,52 @@ mysql_database "grant-omeka-user-remote" do
   action    :query
 end
 
-if node[:omeka][:test_user] != node[:omeka][:mysql_user]
-
-  mysql_database "create-omeka-user-local" do
-    host      "localhost"
-    username  "root"
-    password  node['mysql']['server_root_password']
-    database  "mysql"
-    sql       "CREATE USER '#{node[:omeka][:test_user]}'@'localhost' IDENTIFIED BY '#{node[:omeka][:test_password]}';"
-    action    :query
+mysql_database "create-omeka-user-local" do
+  host      "localhost"
+  username  "root"
+  password  node['mysql']['server_root_password']
+  database  "mysql"
+  sql       "CREATE USER '#{node[:omeka][:test_user]}'@'localhost' IDENTIFIED BY '#{node[:omeka][:test_password]}';"
+  action    :query
+  only_if do
+    node[:omeka][:test_user] != node[:omeka][:mysql_user]
   end
-
-  mysql_database "create-omeka-user-remote" do
-    host      "localhost"
-    username  "root"
-    password  node['mysql']['server_root_password']
-    database  "mysql"
-    sql       "CREATE USER '#{node[:omeka][:test_user]}'@'%' IDENTIFIED BY '#{node[:omeka][:test_password]}';"
-    action    :query
-  end
-
 end
 
-if node[:omeka][:test_user] != node[:omeka][:mysql_user] or node[:omeka][:test_db] != node[:omeka][:mysql_db]
-
-  mysql_database "grant-omeka-user-local" do
-    host      "localhost"
-    username  "root"
-    password  node['mysql']['server_root_password']
-    database  "mysql"
-    sql       "GRANT ALL PRIVILEGES ON #{node[:omeka][:test_db]}.* TO '#{node[:omeka][:test_user]}'@'localhost';"
-    action    :query
+mysql_database "create-omeka-user-remote" do
+  host      "localhost"
+  username  "root"
+  password  node['mysql']['server_root_password']
+  database  "mysql"
+  sql       "CREATE USER '#{node[:omeka][:test_user]}'@'%' IDENTIFIED BY '#{node[:omeka][:test_password]}';"
+  action    :query
+  only_if do
+    node[:omeka][:test_user] != node[:omeka][:mysql_user]
   end
+end
 
-  mysql_database "grant-omeka-user-remote" do
-    host      "localhost"
-    username  "root"
-    password  node['mysql']['server_root_password']
-    database  "mysql"
-    sql       "GRANT ALL PRIVILEGES ON #{node[:omeka][:test_db]}.* TO '#{node[:omeka][:test_user]}'@'%';"
-    action    :query
+mysql_database "grant-omeka-user-local" do
+  host      "localhost"
+  username  "root"
+  password  node['mysql']['server_root_password']
+  database  "mysql"
+  sql       "GRANT ALL PRIVILEGES ON #{node[:omeka][:test_db]}.* TO '#{node[:omeka][:test_user]}'@'localhost';"
+  action    :query
+  only_if do
+    node[:omeka][:test_user] != node[:omeka][:mysql_user] or node[:omeka][:test_db] != node[:omeka][:mysql_db]
   end
+end
 
+mysql_database "grant-omeka-user-remote" do
+  host      "localhost"
+  username  "root"
+  password  node['mysql']['server_root_password']
+  database  "mysql"
+  sql       "GRANT ALL PRIVILEGES ON #{node[:omeka][:test_db]}.* TO '#{node[:omeka][:test_user]}'@'%';"
+  action    :query
+  only_if do
+    node[:omeka][:test_user] != node[:omeka][:mysql_user] or node[:omeka][:test_db] != node[:omeka][:mysql_db]
+  end
 end
 
 ## Set up Omeka
@@ -146,27 +166,29 @@ if node[:omeka][:version] != nil then
   omeka_version = 'master' if omeka_version == 'HEAD'
 
   # If on CentOS, we have to update the SSL certificates manually. Yum. Yeah.
-  if node.platform == 'centos'
-    script "update_ssl_certificates" do
-      interpreter "bash"
-      user "root"
-      cwd "/etc/pki/tls/certs"
-      code <<-EOH
-      if [ ! -d /root/backups/ ] ; then
-        mkdir -p /root/backups/
-      fi
-      mv ca-bundle.crt /root/backups/ca-bundle.crt
-      curl http://curl.haxx.se/ca/cacert.pem -o /etc/pki/tls/certs/ca-bundle.crt
-      EOH
+  script "update_ssl_certificates" do
+    interpreter "bash"
+    user "root"
+    cwd "/etc/pki/tls/certs"
+    code <<-EOH
+    if [ ! -d /root/backups/ ] ; then
+      mkdir -p /root/backups/
+    fi
+    mv ca-bundle.crt /root/backups/ca-bundle.crt
+    curl http://curl.haxx.se/ca/cacert.pem -o /etc/pki/tls/certs/ca-bundle.crt
+    EOH
+    only_if do
+      node.platform == 'centos'
     end
   end
 
-  if File.directory?(node[:omeka][:omeka_dir])
-    script "backup_existing_omeka_dir" do
-      interpreter "bash"
-      user "root"
-      cwd "/vagrant"
-      code "mv #{node[:omeka][:omeka_dir]} #{node[:omeka][:omeka_dir]}.bk"
+  script "backup_existing_omeka_dir" do
+    interpreter "bash"
+    user "root"
+    cwd "/vagrant"
+    code "mv #{node[:omeka][:omeka_dir]} #{node[:omeka][:omeka_dir]}.bk"
+    only_if do
+      File.directory?(node[:omeka][:omeka_dir])
     end
   end
 
@@ -181,28 +203,112 @@ if node[:omeka][:version] != nil then
     reference omeka_ref
     action :checkout
   end
+
 end
 
-# Create the Omeka DB settings file.
-template "#{node[:omeka][:omeka_dir]}/db.ini" do
-  source "db.ini.erb"
-  owner "root"
-  group "root"
-  mode 0644
+# This is bad, bad, bad. I need to change the file permissions for directories
+# under /vagrant, so I have to unmount it and remount it.
+script "set_archive_permissions" do
+  interpreter 'bash'
+  user 'root'
+  cwd '/'
+
+  vm = node[:vagrant][:config][:vm]
+  vagrant_dir = node[:vagrant][:directory]
+  # TODO: Need to look up the name v-root from vm[:shared_folders] the
+  # :guestpath keyed by 'v-root'.
+
+  perms = []
+  perms << "uid=`id -u #{vm[:shared_folder_uid]}`" if vm[:shared_folder_uid] != nil
+  perms << "gid=`id -g #{vm[:shared_folder_gid]}`" if vm[:shared_folder_uid] != nil
+  perms << 'dmode=0777'
+  perms = " -o #{perms.join(",")}" if !perms.empty?
+
+  code <<-EOH
+  umount #{vagrant_dir}
+  mount -t vboxsf#{perms} v-root #{vagrant_dir}
+  EOH
+  only_if do
+    node[:instance_role] == 'vagrant'
+  end
 end
 
-# Create the Omeka test settings file.
-template "#{node[:omeka][:omeka_dir]}/application/tests/config.ini" do
-  source "config.ini.erb"
-  owner "root"
-  group "root"
-  mode 0644
+## Fill in files. This is only necessary on the 
+# Copy and fill in *.changeme files.
+script "htaccess_changeme" do
+  interpreter "bash"
+  user "root"
+  cwd node[:omeka][:omeka_dir]
+  code <<-EOH
+  mv .htaccess.changeme .htaccess
+  EOH
+  not_if do
+    File.exists?("#{node[:omeka][:omeka_dir]}/.htaccess")
+  end
 end
 
-# Patch Omeka to work around problems with port forwarding and setting up the site.
-cookbook_file "#{node[:omeka][:omeka_dir]}/application/models/Installer/Requirements.php" do
-  source "Requirements.php"
-  mode 0644
+script "config_ini_changeme" do
+  interpreter "bash"
+  user "root"
+  cwd node[:omeka][:omeka_dir]
+  code <<-EOH
+  mv application/config/config.ini.changeme application/config/config.ini
+  EOH
+  not_if do
+    File.exists?("#{node[:omeka][:omeka_dir]}/application/config/config.ini")
+  end
+end
+
+ruby_block "tests_config_ini_changeme" do
+  action :create
+  block do
+    subs = {
+      "db.host = \"\"\n"     => "db.host = \"localhost\"",
+      "db.username = \"\"\n" => "db.username = \"#{node[:omeka][:test_user]}\"",
+      "db.password = \"\"\n" => "db.password = \"#{node[:omeka][:test_password]}\"",
+      "db.dbname = \"\"\n"   => "db.dbname = \"#{node[:omeka][:test_db]}\""
+    }
+
+    OmekaUtils.sed(
+      "#{node[:omeka][:omeka_dir]}/application/tests/config.ini.changeme",
+      "#{node[:omeka][:omeka_dir]}/application/tests/config.ini") do |line|
+        subs.fetch(line, line)
+      end
+  end
+  not_if do
+    File.exists?("#{node[:omeka][:omeka_dir]}/application/tests/config.ini")
+  end
+end
+
+ruby_block "db_ini_changeme" do
+  action :create
+  block do
+    subs = {
+      "host     = \"XXXXXXX\"\n" => "host     = \"localhost\"",
+      "username = \"XXXXXXX\"\n" => "username = \"#{node[:omeka][:mysql_user]}\"",
+      "password = \"XXXXXXX\"\n" => "password = \"#{node[:omeka][:mysql_password]}\"",
+      "dbname   = \"XXXXXXX\"\n" => "dbname   = \"#{node[:omeka][:mysql_db]}\"",
+      "prefix   = \"omeka_\"\n"  => "prefix   = \"#{node[:omeka][:mysql_prefix]}\"",
+    }
+    OmekaUtils.sed(
+      "#{node[:omeka][:omeka_dir]}/db.ini.changeme",
+      "#{node[:omeka][:omeka_dir]}/db.ini") do |line|
+        subs.fetch(line, line)
+      end
+  end
+end
+
+ruby_block "requirements_patch" do
+  action :create
+  block do
+    src = "#{node[:omeka][:omeka_dir]}/application/models/Installer/Requirements.php"
+    tmp = "/tmp/Requirements.php"
+    OmekaUtils.sed(src, tmp) do |line|
+      line.sub(/(\s+)(\$this->_checkModRewriteIsEnabled\(\);)$/, '\1// \2')
+    end
+    FileUtils.rm(src)
+    FileUtils.mv(tmp, src)
+  end
 end
 
 ##

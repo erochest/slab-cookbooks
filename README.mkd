@@ -49,6 +49,12 @@ the "end," insert these:
 config.vm.provision :chef_solo do |chef|
   chef.cookbooks_path = ["cookbooks", "slab-cookbooks"]
   chef.add_recipe "omeka"
+
+  # :omeka_version can be a version number tag (e.g., '1.4', '1.3.2') or
+  # 'HEAD' or a branch name.
+  chef.json.merge!({
+    :omeka => { :version => 'stable-1.4' }
+  })
 end
 config.vm.forward_port('mysql', 3306, 3333)
 config.vm.forward_port('apache2', 80, 8080)
@@ -60,23 +66,13 @@ downloaded from GitHub and to use the "omeka" recipe. The last two lines tell
 Vagrant to set up port forwarding so we can access the web server and database
 from the host machine, without needing to log onto the VM.
 
-<h4>Set up Omeka</h4>
+The `chef.json.merge!` part tell it to download Omeka from the GitHub, using
+the "stable-1.4" branch.
 
-Now we're ready to set up Omeka. By default, the system assumes that your Omeka
-code is in a subdirectory of your working directory and that it is named
-"omeka." (This &mdash; and many other things &mdash; are configurable, but
-that's beyond the scope of this post.)
+### Set up Omeka
 
-These commands will download the latest version of Omeka (as of the time I'm
-writing this) and change permissions on the archive directory so the web server
-can write to it.
-
-```bash
-curl -O http://omeka.org/files/omeka-1.4.zip
-unzip omeka-1.4.zip
-mv omeka-1.4 omeka
-chmod -R a+rwx omeka/archive/
-```
+Umm. There used to be stuff you had to do for this, but the Chef recipe takes
+care of all that now.
 
 ### Start the VM
 
