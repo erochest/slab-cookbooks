@@ -203,7 +203,6 @@ if node[:omeka][:version] != nil then
     reference omeka_ref
     action :checkout
   end
-
 end
 
 # This is bad, bad, bad. I need to change the file permissions for directories
