@@ -13,16 +13,8 @@
 
 default[:omeka][:omeka_dir]      = '/vagrant/omeka'
 default[:omeka][:version]        = nil
-default[:omeka][:themes]         = [
-  {:name => 'minimalist',     :url => 'git://github.com/omeka/theme-minimalist.git'},
-  {:name => 'rhythm',         :url => 'git://github.com/omeka/theme-rhythm.git'},
-  {:name => 'seasons',        :url => 'git://github.com/omeka/theme-seasons.git'}
-]
-default[:omeka][:plugins]        = [
-  {:name => 'Coins',          :url => 'git://github.com/omeka/plugin-Coins.git'},
-  {:name => 'ExhibitBuilder', :url => 'git://github.com/omeka/plugin-ExhibitBuilder.git'},
-  {:name => 'SimplePages',    :url => 'git://github.com/omeka/plugin-SimplePages.git'}
-]
+default[:omeka][:themes]         = []
+default[:omeka][:plugins]        = []
 
 default[:omeka][:mysql_user]     = 'omeka'
 default[:omeka][:mysql_password] = 'omeka'

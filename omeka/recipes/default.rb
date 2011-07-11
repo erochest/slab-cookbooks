@@ -22,6 +22,16 @@ require_recipe "git"
 require 'fileutils'
 
 omeka_github = 'https://github.com/omeka/Omeka.git'
+default_themes = [
+  {:name => 'minimalist',     :url => 'git://github.com/omeka/theme-minimalist.git'},
+  {:name => 'rhythm',         :url => 'git://github.com/omeka/theme-rhythm.git'},
+  {:name => 'seasons',        :url => 'git://github.com/omeka/theme-seasons.git'}
+]
+default_plugins = [
+  {:name => 'Coins',          :url => 'git://github.com/omeka/plugin-Coins.git'},
+  {:name => 'ExhibitBuilder', :url => 'git://github.com/omeka/plugin-ExhibitBuilder.git'},
+  {:name => 'SimplePages',    :url => 'git://github.com/omeka/plugin-SimplePages.git'}
+]
 
 # This reads lines from from_file, passes to a block, and writes the block's
 # output to to_file.
