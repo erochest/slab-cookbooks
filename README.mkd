@@ -236,6 +236,35 @@ rake phpcs base_dir=/vagrant/site/plugins/BagIt \
            standard=Zend
 ```
 
+### Overriding Tasks
+
+If you don't want to have to provide all of the options everytime, you can
+include this Rakefile in your Rakefile and provide the default there. For
+instance, if you've checked this cookbook repository out to `slab-books`, you
+could create a Rakefile with these contents:
+
+```ruby
+import "slab-books/Rakefile"
+
+namespace :bagit do
+
+  desc 'Call PHP Mess Detector on BagIt.'
+  task :phpmd do
+    ENV['base_dir'] = '/vagrant/omeka/plugins/BagIt'
+    ENV['output_dir'] = '/vagrant/phpmd'
+    Rake::Task['phpmd'].invoke
+  end
+
+end
+```
+
+Then you could simply call this from your directory:
+
+```bash
+rake bagit:phpmd
+```
+
+
 ## License
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not
