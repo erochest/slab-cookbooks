@@ -22,11 +22,24 @@ From https://github.com/opscode/cookbooks:
 
 # Attributes
 
+ * `node[:omeka][:omeka_dir]` — The directory in the VM that contains the Omeka
+   instance. This defaults to "/vagrant/omeka".
  * `node[:omeka][:version]` — If given, then this version of Omeka will be
    check out of GitHub. This can be 'HEAD', 'master', a version number tag
    (e.g., '1.4.1'), or any branch in the repository. This will also check out
    the plugins for that version. If not given, this doesn't download anything,
    because it assumes that you will take care of getting Omeka.
+ * `node[:omeka][:themes]` — This is a list of themes to install. Each theme is
+   a JSON object (Ruby Hash) that contains the keys "name" and "url." The name
+   is the name of the theme and the name of the subdirectory to create under
+   `:omeka_dir/themes`. The URL should point to a Git repository containing the
+   theme.
+ * `node[:omeka][:plugins]` — This is a list of plugins to install. Each plug
+   in is a JSON object (Ruby Hash) that contains the keys "name" and "url." The
+   name is the name of the plug in and the name of the subdirectory to create
+   under `:omeak_dir/plugins`. The URL should point to a Git repository
+   containing the plugin.
+
  * `node[:omeka][:mysql_user]` — The MySQL user to create to access the Omeka
    database. This defaults to "omeka".
  * `node[:omeka][:mysql_password]` — The password for
@@ -35,13 +48,12 @@ From https://github.com/opscode/cookbooks:
    defaults to "omeka".
  * `node[:omeka][:mysql_prefix]` — The prefix for Omeka put on its tables in
    the database. This default to "omeka_".
- * `node[:omeka][:omeka_dir]` — The directory in the VM that contains the Omeka
-   instance. This defaults to "/vagrant/omeka".
+
  * `node[:omeka][:test_user]` — The MySQL user to create for the test Omeka
    database. This defaults to "omeka".
  * `node[:omeka][:test_password]` — The password for
    `node[:omeka][:test_user]`. This also defaults to "omeka".
- * `node[:omeka][:mysql_db]` — The database to create for running unit tests on
+ * `node[:omeka][:test_db]` — The database to create for running unit tests on
    the Omeka site. This defaults to "omeka".
 
 # Installed
