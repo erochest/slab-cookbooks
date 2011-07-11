@@ -30,15 +30,17 @@ From https://github.com/opscode/cookbooks:
    the plugins for that version. If not given, this doesn't download anything,
    because it assumes that you will take care of getting Omeka.
  * `node[:omeka][:themes]` — This is a list of themes to install. Each theme is
-   a JSON object (Ruby Hash) that contains the keys "name" and "url." The name
-   is the name of the theme and the name of the subdirectory to create under
-   `:omeka_dir/themes`. The URL should point to a Git repository containing the
-   theme.
+   a JSON object (Ruby Hash) that contains the keys "name", "url", and
+   "revision". The name is the name of the theme and the name of the
+   subdirectory to create under `:omeka_dir/themes`. The URL should point to a
+   Git repository containing the theme. The revision is the Git reference to
+   check out.
  * `node[:omeka][:plugins]` — This is a list of plugins to install. Each plug
-   in is a JSON object (Ruby Hash) that contains the keys "name" and "url." The
-   name is the name of the plug in and the name of the subdirectory to create
-   under `:omeak_dir/plugins`. The URL should point to a Git repository
-   containing the plugin.
+   in is a JSON object (Ruby Hash) that contains the keys "name", "url", and
+   "revision". The name is the name of the plug in and the name of the
+   subdirectory to create under `:omeak_dir/plugins`. The URL should point to a
+   Git repository containing the plugin. The revision is the Git reference to
+   check out.
 
  * `node[:omeka][:mysql_user]` — The MySQL user to create to access the Omeka
    database. This defaults to "omeka".
