@@ -320,6 +320,38 @@ ruby_block "requirements_patch" do
   end
 end
 
+## Download Themes
+default_themes.each do |theme_info|
+  git "#{node[:omeka][:omeka_dir]}/themes/#{theme_info[:name]}" do
+    repository theme_info[:url]
+    reference  theme_info.fetch(:revision, 'master')
+    action     :checkout
+  end
+end
+node[:omeka][:themes].each do |theme_info|
+  git "#{node[:omeka][:omeka_dir]}/themes/#{theme_info[:name]}" do
+    repository theme_info[:url]
+    reference  theme_info.fetch(:revision, 'master')
+    action     :checkout
+  end
+end
+
+## Download Plug Ins
+default_plugins.each do |plugin_info|
+  git "#{node[:omeka][:omeka_dir]}/plugins/#{plugin_info[:name]}" do
+    repository plugin_info[:url]
+    reference  plugin_info.fetch(:revision, 'master')
+    action     :checkout
+  end
+end
+node[:omeka][:plugins].each do |plugin_info|
+  git "#{node[:omeka][:omeka_dir]}/plugins/#{plugin_info[:name]}" do
+    repository plugin_info[:url]
+    reference  plugin_info.fetch(:revision, 'master')
+    action     :checkout
+  end
+end
+
 ##
 # Set up the site in Apache.
 template "#{node[:apache][:dir]}/sites-available/default" do

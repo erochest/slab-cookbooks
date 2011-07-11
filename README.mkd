@@ -57,7 +57,7 @@ config.vm.provision :chef_solo do |chef|
       :version => 'stable-1.4',
       :themes => [{:name => 'dark', :url => 'git://github.com/omeka/theme-dark.git'}],
       :plugins => [
-        {:name => 'BagIt', :url => 'https://erochest@github.com/scholarslab/BagItPlugin.git'},
+        {:name => 'BagIt', :url => 'https://github.com/scholarslab/BagItPlugin.git'},
         {:name => 'Dropbox', :url => 'git://github.com/omeka/plugin-Dropbox.git',
          :revision => 'tags/1.3-0.5'}
       ]
