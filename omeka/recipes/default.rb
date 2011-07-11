@@ -33,19 +33,6 @@ default_plugins = [
   {:name => 'SimplePages',    :url => 'git://github.com/omeka/plugin-SimplePages.git'}
 ]
 
-# This reads lines from from_file, passes to a block, and writes the block's
-# output to to_file.
-module OmekaUtils
-  def OmekaUtils.sed(from_file, to_file)
-    File.open(to_file, 'w') do |output|
-      File.open(from_file).each do |line|
-        line = yield line
-        output.puts(line)
-      end
-    end
-  end
-end
-
 # Set up the PHP MySQL package.
 mysql_pkg = value_for_platform(
     [ "centos", "redhat", "fedora" ] => {"default" => "php53-mysql"}, 
