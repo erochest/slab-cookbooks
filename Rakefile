@@ -22,6 +22,7 @@ def run_cmd(env, cmd, output_dir)
     end
     ssh.exec!(cmd) do |channel, stream, data|
       print data
+      $stdout.flush
     end
   end
 
