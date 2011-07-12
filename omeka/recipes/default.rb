@@ -299,6 +299,26 @@ ruby_block "db_ini_changeme" do
   end
 end
 
+# For some reason, this is making index not redirect to install/ under Lucid.
+if node.platform == 'ubuntu'
+  ruby_block "options_php_patch" do
+    action :create
+    block do
+      src = "#{node[:omeka][:omeka_dir]}/application/libraries/Omeka/Core/Resource/Options.php"
+      tmp = "/tmp/Options.php"
+      OmekaUtils.sed(src, tmp) do |line|
+        if line.lstrip.start_with?('header(\'Location:')
+          line + ' exit;'
+        else
+          line
+        end
+      end
+      FileUtils.rm(src)
+      FileUtils.mv(tmp, src)
+    end
+  end
+end
+
 ruby_block "requirements_patch" do
   action :create
   block do
@@ -444,4 +464,17 @@ when 'ubuntu'
   end
 end
 
+# Touch a couple of files so that Apache can write to them later, if necessary.
+file "#{node[:omeka][:omeka_dir]}/application/logs/errors.log" do
+  owner  'root'
+  group  'root'
+  mode   '0755'
+  action :create
+end
+file "#{node[:omeka][:omeka_dir]}/application/logs/processes.log" do
+  owner  'root'
+  group  'root'
+  mode   '0755'
+  action :create
+end
 

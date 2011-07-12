@@ -21,7 +21,7 @@ def run_cmd(env, cmd, output_dir)
       ssh.exec!("if [ ! -d #{output_dir} ] ; then mkdir -p #{output_dir} ; fi")
     end
     ssh.exec!(cmd) do |channel, stream, data|
-      puts data
+      print data
     end
   end
 
