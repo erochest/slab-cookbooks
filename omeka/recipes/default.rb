@@ -11,6 +11,7 @@
 # Copyright   2010 The Board and Visitors of the University of Virginia
 # License     http://www.apache.org/licenses/LICENSE-2.0.html Apache 2 License
 
+# require_recipe "ohai"
 require_recipe "apache2"
 require_recipe "apache2::mod_php5"
 require_recipe "apache2::mod_rewrite"
@@ -40,6 +41,10 @@ mysql_pkg = value_for_platform(
   )
 
 package mysql_pkg do
+  action :install
+end
+
+gem_package 'mysql' do
   action :install
 end
 
@@ -409,26 +414,34 @@ php_pear "PHP_CodeSniffer" do
   action   :install
 end
 
-script "pecl/xdebug" do
-  # OMG, this seems more painful than necessary. There's no php53-* package for
-  # CentOS, and just a simple 'pecl install' doesn't work either.
+case node.platform
+when 'centos'
+  script "pecl/xdebug" do
+    # OMG, this seems more painful than necessary. There's no php53-* package for
+    # CentOS, and just a simple 'pecl install' doesn't work either.
 
-  interpreter "bash"
-  user "root"
-  cwd "/tmp"
+    interpreter "bash"
+    user "root"
+    cwd "/tmp"
 
-  code <<-EOH
-  mkdir xdebug-install
-  cd xdebug-install
-  pecl download xdebug
-  tar xfz *.tgz
-  cd $(find . -type d -and -name 'xdebug*')
-  phpize
-  ./configure
-  make
-  make install
-  echo 'zend_extension="/usr/lib/php/modules/xdebug.so"' > /etc/php.d/xdebug.ini
-  EOH
+    code <<-EOH
+    mkdir xdebug-install
+    cd xdebug-install
+    pecl download xdebug
+    tar xfz *.tgz
+    cd $(find . -type d -and -name 'xdebug*')
+    phpize
+    ./configure
+    make
+    make install
+    echo 'zend_extension="/usr/lib/php/modules/xdebug.so"' > /etc/php.d/xdebug.ini
+    EOH
+  end
+
+when 'ubuntu'
+  package 'php5-xdebug' do
+    action :install
+  end
 end
 
 

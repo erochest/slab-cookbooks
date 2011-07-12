@@ -11,11 +11,12 @@
 # Copyright   2010 The Board and Visitors of the University of Virginia
 # License     http://www.apache.org/licenses/LICENSE-2.0.html Apache 2 License
 
-maintainer "Eric Rochester"
+maintainer       "Eric Rochester"
 maintainer_email "err8n@virginia.edu"
-license "Apache 2.0"
-description "Installs and configures Omeka."
-version "0.0.1"
+license          "Apache 2.0"
+description      "Installs and configures Omeka."
+long_description IO.read(File.join(File.dirname(__FILE__), 'README.mkd'))
+version          "0.0.1"
 
 depends "apache2"
 depends "php"
@@ -23,7 +24,8 @@ depends "mysql"
 depends "imagemagick"
 depends "git"
 
-%w{ centos }.each do |os|
+# This may work with more distributions, but I've only tested it on these.
+%w{ ubuntu centos }.each do |os|
   supports os
 end
 

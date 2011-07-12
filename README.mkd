@@ -32,7 +32,7 @@ mkdir omeka-project
 cd omeka-project
 git clone https://github.com/opscode/cookbooks.git
 git clone git://github.com/scholarslab/cookbooks.git slab-cookbooks
-vagrant init omeka-project PATH-TO/base-centos32.box
+vagrant init omeka-project http://files.vagrantup.com/lucid32.box
 ```
 
 The last command created a file called "Vagrantfile". (It also pointed to a
@@ -78,6 +78,36 @@ The `chef.json.merge!` part tell it to download Omeka from the GitHub, using
 the "stable-1.4" branch. It tells it to also download the "dark" theme and the
 "BagIt" and "Dropbox" plugins, as well as the default plugins. Currently, this
 only works with Git repositories.
+
+### Hacks
+
+Ah, life on the bleeding edge. There are a few issues with (as far as I can
+tell) using the OpsCode with Vagrant and Chef Solo.
+
+First, it includes a set of recipes for Windows, and Chef attempts to use this
+whether you're on Windows or not. You can get around that by including this at
+the top of your Vagrant file:
+
+```ruby
+if File.directory?('cookbooks/windows')
+  FileUtils.remove_dir('cookbooks/windows', true)
+end
+```
+
+Second, it attempts to access a `cloud` and several other attributes, so you
+have to include them in your settings, whether you need them or not. Include
+this in `Vagrantfile` in the `chef.json.merge!` expression:
+
+```ruby
+    chef.json.merge!({
+      :omeka => {
+        # ...
+      },
+      :cloud => nil,
+      :domain => [],
+      :openldap => {}
+    })
+```
 
 ### Set up Omeka
 
