@@ -8,6 +8,7 @@ This installs a Solr instance.
 ## Platform
 
  * Ubuntu (Lucid)
+ * CentOS
 
 ## Cookbooks
 

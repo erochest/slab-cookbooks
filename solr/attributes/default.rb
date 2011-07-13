@@ -11,21 +11,9 @@
 # Copyright   2011 The Board and Visitors of the University of Virginia
 # License     http://www.apache.org/licenses/LICENSE-2.0.html Apache 2 License
 
-maintainer       "Eric Rochester"
-maintainer_email "err8n@virginia.edu"
-license          "Apache 2.0"
-description      "Installs and configures a Solr instance running behind Tomcat."
-long_description IO.read(File.join(File.dirname(__FILE__), 'README.mkd'))
-version          "0.0.1"
 
-depends "java"
-depends "tomcat"
-
-# This may work with more distributions, but I've only tested it on these.
-%w{ centos ubuntu }.each do |os|
-  supports os
-end
-
-recipe "solr", "Installs and configures a Solr instance running behind Tomcat."
-
+# NB: These are only used for CentOS, where there isn't a standard package.
+node[:solr] ||= {}
+node[:solr][:download_url] = 'http://www.reverse.net/pub/apache//lucene/solr/1.4.1/apache-solr-1.4.1.tgz'
+node[:solr][:solr_dir] = '/var/solr'
 

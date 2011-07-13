@@ -14,19 +14,57 @@
 require_recipe "java"
 require_recipe "tomcat"
 
-solr_pkgs = value_for_platform(
-  ['debian', 'ubuntu'] => {
-    'default' => ['solr-tomcat']
-  },
-  ['centos', 'redhat', 'fedora'] => {
-    'default' => []
-  },
-  'default' => []
-)
-
-solr_pkgs.each do |pkg|
-  package pkg do
+case node.platform
+when 'ubuntu'
+  package 'solr-tomcat' do
     action :install
   end
+
+when 'centos'
+  # Urg. No package. Might be easier to just skip the packages for Ubuntu, too,
+  # though.
+
+  remote_file '/tmp/apache-solr.tgz' do
+    source node[:solr][:download_url]
+    action :create
+  end
+
+  script 'install_solr' do
+    interpreter 'bash'
+    user 'root'
+    cwd '/tmp'
+    action :run
+    code <<-EOH
+    TOMCAT6_DIR=#{node[:tomcat][:webapp_dir]}
+    SOLR_DIR=#{node[:solr][:solr_dir]}
+    tar xfz apache-solr.tgz
+    mv apache-solr-* $SOLR_DIR
+    mkdir -p $SOLR_DIR/site/data
+    cp -r $SOLR_DIR/example/solr/conf $SOLR_DIR/site/
+    cp $SOLR_DIR/dist/*.war $SOLR_DIR/site/apache-solr.war
+    EOH
+  end
+
+  template "#{node[:solr][:solr_dir]}/site/conf/solrconfig.xml" do
+    source 'solrconfig.xml.erb'
+    owner 'root'
+    mode '0755'
+    action :create
+  end
+
+  template "#{node[:tomcat][:context_dir]}/solr.xml" do
+    source 'solr-context.xml.erb'
+    owner 'root'
+    mode '0755'
+    action :create
+  end
+
+  execute 'chown_site' do
+    command "chown -R #{node[:tomcat][:user]}:#{node[:tomcat][:group]} #{node[:solr][:solr_dir]}"
+    user 'root'
+    cwd '/tmp'
+    action :run
+  end
+
 end
 
