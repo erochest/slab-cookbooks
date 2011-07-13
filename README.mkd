@@ -307,11 +307,11 @@ rake phpcs base_dir=/vagrant/site/plugins/BagIt \
 
 If you don't want to have to provide all of the options everytime, you can
 include this Rakefile in your Rakefile and provide the default there. For
-instance, if you've checked this cookbook repository out to `slab-books`, you
-could create a Rakefile with these contents:
+instance, if you've checked this cookbook repository out to `slab-cookbooks`,
+you could create a Rakefile with these contents:
 
 ```ruby
-import "slab-books/Rakefile"
+import "slab-cookbooks/Rakefile"
 
 namespace :bagit do
 
