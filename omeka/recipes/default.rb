@@ -8,7 +8,7 @@
 # language governing permissions and limitations under the License.
 #
 # Author      Eric Rochester <err8n@virginia.edu>
-# Copyright   2010 The Board and Visitors of the University of Virginia
+# Copyright   2011 The Board and Visitors of the University of Virginia
 # License     http://www.apache.org/licenses/LICENSE-2.0.html Apache 2 License
 
 # require_recipe "ohai"
@@ -476,5 +476,42 @@ file "#{node[:omeka][:omeka_dir]}/application/logs/processes.log" do
   group  'root'
   mode   '0755'
   action :create
+end
+
+
+#* `:username` — Default Superuser Account Username *(required)*
+#* `:password` — Default Superuser Account Password *(required)*
+#* `:super_email` — Default Superuser Account Email *(required)*
+#* `:administrator_email` — Site Administrator Email *(required)*
+#* `:site_title` — Site Title *(required)*
+#* `:description` — Site Description
+#* `:copyright` — Site Copyright Information
+#* `:author` — Site Author Information
+#* `:tag_delimiter` — Tag Delimiter *(default is ',')*
+#* `:fullsize_constraint` — Fullsize Image Size *(required, default is 800)*
+#* `:thumbnail_constraint` — Thumbnail Size *(required, default is 200)*
+#* `:square_thumbnail_constraint` — Square Thumbnail Size *(required, default
+#is 200)*
+#* `:per_page_admin` — Items Per Page (admin) *(required, default is 10)*
+#* `:per_page_public` — Items Per Page (public) *(required, default is 10)*
+#* `:show_empty_elements` — Show Empty Elements *(default is false)*
+#* `:path_to_convert` — Imagemagick Directory Path *(default is '/usr/bin')*
+service 'apache2' do
+  action :restart
+end
+
+script "omeka_post_install" do
+  interpreter "bash"
+  user "root"
+  cwd "/tmp"
+  code <<-EOH
+  wget -O /tmp/install.html --post-data='username=#{OmekaUtils.escape(node[:omeka][:username])}&password=#{OmekaUtils.escape(node[:omeka][:password])}&password_confirm=#{OmekaUtils.escape(node[:omeka][:password])}&super_email=#{OmekaUtils.escape(node[:omeka][:super_email])}&administrator_email=#{OmekaUtils.escape(node[:omeka][:administrator_email])}&site_title=#{OmekaUtils.escape(node[:omeka][:site_title])}&description=#{OmekaUtils.escape(node[:omeka][:description])}&copyright=#{OmekaUtils.escape(node[:omeka][:copyright])}&author=#{OmekaUtils.escape(node[:omeka][:author])}&tag_delimiter=#{OmekaUtils.escape(node[:omeka][:tag_delimiter])}&fullsize_constraint=#{OmekaUtils.escape(node[:omeka][:fullsize_constraint])}&thumbnail_constraint=#{OmekaUtils.escape(node[:omeka][:thumbnail_constraint])}&square_thumbnail_constraint=#{OmekaUtils.escape(node[:omeka][:square_thumbnail_constraint])}&per_page_admin=#{OmekaUtils.escape(node[:omeka][:per_page_admin])}&per_page_public=#{OmekaUtils.escape(node[:omeka][:per_page_public])}&show_empty_elements=#{OmekaUtils.escape(node[:omeka][:show_empty_elements])}&path_to_covert=#{OmekaUtils.escape(node[:omeka][:path_to_covert])}&install_confirm=install_confirm' http://localhost/install/
+  EOH
+  only_if do
+    (node[:omeka][:username] &&
+     node[:omeka][:password] && node[:omeka][:password].length >= 6 &&
+     node[:omeka][:super_email] && node[:omeka][:administrator_email] &&
+     node[:omeka][:site_title])
+  end
 end
 

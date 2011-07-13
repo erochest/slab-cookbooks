@@ -11,6 +11,7 @@
 # Copyright   2010 The Board and Visitors of the University of Virginia
 # License     http://www.apache.org/licenses/LICENSE-2.0.html Apache 2 License
 
+require 'uri'
 
 module OmekaUtils
 
@@ -23,6 +24,12 @@ module OmekaUtils
         output.puts(line)
       end
     end
+  end
+
+  # This escapes a value for including in a URI.
+  def OmekaUtils.escape(val)
+    val ||= ''
+    URI.escape(val.to_s, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
   end
 
 end

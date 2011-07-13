@@ -79,6 +79,45 @@ the "stable-1.4" branch. It tells it to also download the "dark" theme and the
 "BagIt" and "Dropbox" plugins, as well as the default plugins. Currently, this
 only works with Git repositories.
 
+### Install Information
+
+You can also supply information for the installation page in the Vagrantfile.
+This information is included in the `chef.json.merge!` expression, keyed by
+these fields:
+
+ * `:username` — Default Superuser Account Username *(required)*
+ * `:password` — Default Superuser Account Password *(required)*
+ * `:super_email` — Default Superuser Account Email *(required)*
+ * `:administrator_email` — Site Administrator Email *(required)*
+ * `:site_title` — Site Title *(required)*
+ * `:description` — Site Description
+ * `:copyright` — Site Copyright Information
+ * `:author` — Site Author Information
+ * `:tag_delimiter` — Tag Delimiter *(default is ',')*
+ * `:fullsize_constraint` — Fullsize Image Size *(required, default is 800)*
+ * `:thumbnail_constraint` — Thumbnail Size *(required, default is 200)*
+ * `:square_thumbnail_constraint` — Square Thumbnail Size *(required, default
+   is 200)*
+ * `:per_page_admin` — Items Per Page (admin) *(required, default is 10)*
+ * `:per_page_public` — Items Per Page (public) *(required, default is 10)*
+ * `:show_empty_elements` — Show Empty Elements *(default is false)*
+ * `:path_to_convert` — Imagemagick Directory Path *(default is '/usr/bin')*
+
+For example, a minimal specification would look like this:
+
+```ruby
+    chef.json.merge!({
+      :omeka => {
+        # ...
+        :username => 'root',
+        :password => 'omeka',
+        :super_email => 'root@whatever.org',
+        :administrator_email => 'admin@whatever.org',
+        :site_title => 'Whatever Site'
+      }
+    })
+```
+
 ### Hacks
 
 Ah, life on the bleeding edge. There are a few issues with (as far as I can
@@ -147,9 +186,10 @@ vagrant ssh
 
 ### Finishing the Omeka Installation
 
-Now you need to finish setting up Omeka. Just point your browser to
-http://localhost:8080 running on the VM and fill in the installation
-information like you normally would. Nothing special here.
+If you didn't supply the information in the Vagrantfile, then you'll need to
+finish setting up Omeka now. Just point your browser to http://localhost:8080
+running on the VM and fill in the installation information like you normally
+would. Nothing special here.
 
 ### Developing
 

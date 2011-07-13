@@ -22,6 +22,8 @@ From https://github.com/opscode/cookbooks:
 
 # Attributes
 
+Attributes for the basic Omeka files installation:
+
  * `node[:omeka][:omeka_dir]` — The directory in the VM that contains the Omeka
    instance. This defaults to "/vagrant/omeka".
  * `node[:omeka][:version]` — If given, then this version of Omeka will be
@@ -42,6 +44,8 @@ From https://github.com/opscode/cookbooks:
    Git repository containing the plugin. The revision is the Git reference to
    check out.
 
+Attributes for databases:
+
  * `node[:omeka][:mysql_user]` — The MySQL user to create to access the Omeka
    database. This defaults to "omeka".
  * `node[:omeka][:mysql_password]` — The password for
@@ -57,6 +61,32 @@ From https://github.com/opscode/cookbooks:
    `node[:omeka][:test_user]`. This also defaults to "omeka".
  * `node[:omeka][:test_db]` — The database to create for running unit tests on
    the Omeka site. This defaults to "omeka".
+
+Attributes for site installation:
+
+ * `node[:omeka][:username]` — Default Superuser Account Username *(required)*
+ * `node[:omeka][:password]` — Default Superuser Account Password *(required)*
+ * `node[:omeka][:super_email]` — Default Superuser Account Email *(required)*
+ * `node[:omeka][:administrator_email]` — Site Administrator Email *(required)*
+ * `node[:omeka][:site_title]` — Site Title *(required)*
+ * `node[:omeka][:description]` — Site Description
+ * `node[:omeka][:copyright]` — Site Copyright Information
+ * `node[:omeka][:author]` — Site Author Information
+ * `node[:omeka][:tag_delimiter]` — Tag Delimiter *(default is ',')*
+ * `node[:omeka][:fullsize_constraint]` — Fullsize Image Size *(required,
+   default is 800)*
+ * `node[:omeka][:thumbnail_constraint]` — Thumbnail Size *(required, default
+   is 200)*
+ * `node[:omeka][:square_thumbnail_constraint]` — Square Thumbnail Size
+   *(required, default is 200)*
+ * `node[:omeka][:per_page_admin]` — Items Per Page (admin) *(required, default
+   is 10)*
+ * `node[:omeka][:per_page_public]` — Items Per Page (public) *(required,
+   default is 10)*
+ * `node[:omeka][:show_empty_elements]` — Show Empty Elements *(default is
+   false)*
+ * `node[:omeka][:path_to_convert]` — Imagemagick Directory Path *(default is
+   '/usr/bin')*
 
 # Installed
 
@@ -87,6 +117,6 @@ OF ANY KIND, either express or implied. See the License for the specific
 language governing permissions and limitations under the License.
 
 *Author*:      Eric Rochester <err8n@virginia.edu>
-*Copyright*:   2010 The Board and Visitors of the University of Virginia
+*Copyright*:   2011 The Board and Visitors of the University of Virginia
 *License*:     http://www.apache.org/licenses/LICENSE-2.0.html Apache 2 License
 
