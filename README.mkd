@@ -42,9 +42,6 @@ open it up in your favorite text editor. Vagrantfile is just Ruby, nothing
 scary there. We need to add a few lines. At the bottom of the file, just before
 the "end," insert these:
 
-> **Note**: the base-centos32.box isn't publicly available at the moment.
-> Theoretically, this should work with any system, but I haven't tested it.
-
 ```ruby
 config.vm.provision :chef_solo do |chef|
   chef.cookbooks_path = ["cookbooks", "slab-cookbooks"]
