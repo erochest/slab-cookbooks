@@ -8,6 +8,7 @@ This installs and configures an Omeka instance.
 ## Platform
 
  * CentOS
+ * Ubuntu (Lucid)
 
 This will probably work with other platforms, too, but I haven't tested them.
 
