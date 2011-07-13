@@ -130,16 +130,15 @@ if File.directory?('cookbooks/windows')
 end
 ```
 
-Second, it attempts to access a `cloud` and several other attributes, so you
-have to include them in your settings, whether you need them or not. Include
-this in `Vagrantfile` in the `chef.json.merge!` expression:
+Second, it attempts to access several attributes that don't exist, so you have
+to include them in your settings, whether you need them or not. Include this in
+`Vagrantfile` in the `chef.json.merge!` expression:
 
 ```ruby
     chef.json.merge!({
       :omeka => {
         # ...
       },
-      :cloud => nil,
       :domain => [],
       :openldap => {}
     })
