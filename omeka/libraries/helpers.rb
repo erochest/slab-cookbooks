@@ -8,7 +8,7 @@
 # language governing permissions and limitations under the License.
 #
 # Author      Eric Rochester <err8n@virginia.edu>
-# Copyright   2010 The Board and Visitors of the University of Virginia
+# Copyright   2011 The Board and Visitors of the University of Virginia
 # License     http://www.apache.org/licenses/LICENSE-2.0.html Apache 2 License
 
 require 'uri'
