@@ -117,7 +117,7 @@ License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS
 OF ANY KIND, either express or implied. See the License for the specific
 language governing permissions and limitations under the License.
 
-*Author*:      Eric Rochester <err8n@virginia.edu>
-*Copyright*:   2011 The Board and Visitors of the University of Virginia
-*License*:     http://www.apache.org/licenses/LICENSE-2.0.html Apache 2 License
+*Author*:      Eric Rochester <[err8n@virginia.edu](mailto:err8n@virginia.edu)> <br />
+*Copyright*:   2011 The Board and Visitors of the University of Virginia <br />
+*License*:     http://www.apache.org/licenses/LICENSE-2.0.html Apache 2 License <br />
 
