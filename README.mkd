@@ -52,7 +52,11 @@ config.vm.provision :chef_solo do |chef|
   chef.json.merge!({
     :omeka => {
       :version => 'stable-1.4',
-      :themes => [{:name => 'dark', :url => 'git://github.com/omeka/theme-dark.git'}],
+      :themes => [
+        {:name => 'dark', :url => 'git://github.com/omeka/theme-dark.git'},
+        {:name => 'something', :url => 'http://svn.something.org/svn/themes/something/trunk',
+         :type => 'svn', :svn_username => 'someuser', :svn_password => 'somepass'}
+      ],
       :plugins => [
         {:name => 'BagIt', :url => 'https://github.com/scholarslab/BagItPlugin.git'},
         {:name => 'Dropbox', :url => 'git://github.com/omeka/plugin-Dropbox.git',
@@ -75,6 +79,10 @@ The `chef.json.merge!` part tell it to download Omeka from the GitHub, using
 the "stable-1.4" branch. It tells it to also download the "dark" theme and the
 "BagIt" and "Dropbox" plugins, as well as the default plugins. Currently, this
 only works with Git repositories.
+
+It also has a Hash to check out a Subversion repository. These look just like
+the Git Hashes, but they also include a :type key value the value 'svn' and the
+keys :svn_username and :svn_password.
 
 ### Install Information
 

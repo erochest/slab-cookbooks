@@ -19,6 +19,7 @@ require_recipe "php"
 require_recipe "mysql::server"
 require_recipe "imagemagick"
 require_recipe "git"
+require_recipe "subversion"
 
 require 'fileutils'
 
@@ -332,36 +333,44 @@ ruby_block "requirements_patch" do
   end
 end
 
-## Download Themes
-default_themes.each do |theme_info|
-  git "#{node[:omeka][:omeka_dir]}/themes/#{theme_info[:name]}" do
-    repository theme_info[:url]
-    reference  theme_info.fetch(:revision, 'master')
-    action     :checkout
+# This handles a repository checkout specification (i.e., a Hash with the
+# keys :name and :url and maybe :type).
+def make_repo_task(node, base_dir, repo)
+  case repo.fetch(:type, 'git')
+  when 'svn'
+    subversion "#{base_dir}/#{repo[:name]}" do
+      repository   repo[:url]
+      action       :checkout
+      svn_username repo.fetch(:svn_username, nil)
+      svn_password repo.fetch(:svn_password, nil)
+    end
+
+  when 'git'
+    git "#{base_dir}/#{repo[:name]}" do
+      repository repo[:url]
+      reference  repo.fetch(:revision, 'master')
+      action     :checkout
+    end
+
+  else
+    raise "Invalid repository type: '#{repo[:type]}'."
   end
 end
+
+## Download Themes
+default_themes.each do |theme_info|
+  make_repo_task(node, "#{node[:omeka][:omeka_dir]}/themes", theme_info)
+end
 node[:omeka][:themes].each do |theme_info|
-  git "#{node[:omeka][:omeka_dir]}/themes/#{theme_info[:name]}" do
-    repository theme_info[:url]
-    reference  theme_info.fetch(:revision, 'master')
-    action     :checkout
-  end
+  make_repo_task(node, "#{node[:omeka][:omeka_dir]}/themes", theme_info)
 end
 
 ## Download Plug Ins
 default_plugins.each do |plugin_info|
-  git "#{node[:omeka][:omeka_dir]}/plugins/#{plugin_info[:name]}" do
-    repository plugin_info[:url]
-    reference  plugin_info.fetch(:revision, 'master')
-    action     :checkout
-  end
+  make_repo_task(node, "#{node[:omeka][:omeka_dir]}/plugins", plugin_info)
 end
 node[:omeka][:plugins].each do |plugin_info|
-  git "#{node[:omeka][:omeka_dir]}/plugins/#{plugin_info[:name]}" do
-    repository plugin_info[:url]
-    reference  plugin_info.fetch(:revision, 'master')
-    action     :checkout
-  end
+  make_repo_task(node, "#{node[:omeka][:omeka_dir]}/plugins", plugin_info)
 end
 
 ##
