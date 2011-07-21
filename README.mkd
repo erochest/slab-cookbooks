@@ -195,6 +195,12 @@ finish setting up Omeka now. Just point your browser to http://localhost:8080
 running on the VM and fill in the installation information like you normally
 would. Nothing special here.
 
+### For Example
+
+There is an example of using Rake and Vagrant to manage your development
+environment. You can check it out at
+[https://github.com/scholarslab/FalmouthDevEnv](https://github.com/scholarslab/FalmouthDevEnv).
+
 ### Developing
 
 The Omeka code running the site is on your host machine, in the omeka/
