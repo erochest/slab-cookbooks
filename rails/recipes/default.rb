@@ -11,33 +11,41 @@
 # Copyright   2011 The Board and Visitors of the University of Virginia
 # License     http://www.apache.org/licenses/LICENSE-2.0.html Apache 2 License
 
-# First, need to get Ruby 1.9.2. I'm going down to the metal to install this
-# into /usr/local from source.
+# Install Ruby 1.9.2 and set it as default. Use system-wide RVM.
+require_recipe 'git'
 
-script 'compile_install_ruby' do
+package 'curl'
+
+script 'rvm' do
   interpreter 'bash'
   user 'root'
   code <<-EOS
-  wget -O dl-ruby-stable.tar.gz #{node[:rails][:ruby_url]}
-  tar xfz dl-ruby-stable.tar.gz
-  cd ruby-*
-  ./configure
-  make
-  make install
+  bash < <(curl -sk https://rvm.beginrescueend.com/install/rvm)
+  PATH=$PATH:/usr/local/rvm/bin
+  rvm install 1.9.2
+  rvm use 1.9.2 --default
   EOS
 end
 
 script 'gem_install_rails' do
   interpreter 'bash'
   user 'root'
-  code 'gem install rails'
+  code <<-EOS
+  PATH=/usr/local/rvm/bin:$PATH
+  rvm install 1.9.2
+  gem install rails
+  EOS
 end
 
 node[:rails][:gems].each do |pkg|
   script "gem_install_#{node[:rails][:gems]}" do
     interpreter 'bash'
     user 'root'
-    code "gem install #{node[:rails][:gems]}"
+    code <<-EOS
+    PATH=/usr/local/rvm/bin:$PATH
+    rvm install 1.9.2
+    gem install #{node[:rails][:gems]}
+    EOS
   end
 end
 

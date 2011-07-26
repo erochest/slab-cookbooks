@@ -13,7 +13,7 @@
 
 name             'rails'
 version          '0.1'
-depends          %w{gems postgresqldev}
+depends          %w{gems postgresqldev curl git}
 description      'This just sets up RoR and the postgresql gem.'
 maintainer       "Eric Rochester"
 maintainer_email "err8n@virginia.edu"
