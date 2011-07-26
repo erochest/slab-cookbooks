@@ -439,7 +439,7 @@ php_pear "PHP_PMD" do
 end
 
 php_pear "PHP_CodeSniffer" do
-  version  "1.3.0a1"
+  version  "1.3.0"
   action   :install
 end
 
