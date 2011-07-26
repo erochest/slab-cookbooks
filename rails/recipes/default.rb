@@ -11,8 +11,33 @@
 # Copyright   2011 The Board and Visitors of the University of Virginia
 # License     http://www.apache.org/licenses/LICENSE-2.0.html Apache 2 License
 
-gem_package 'rails'
+# First, need to get Ruby 1.9.2. I'm going down to the metal to install this
+# into /usr/local from source.
+
+script 'compile_install_ruby' do
+  interpreter 'bash'
+  user 'root'
+  code <<-EOS
+  wget -O dl-ruby-stable.tar.gz #{node[:rails][:ruby_url]}
+  tar xfz dl-ruby-stable.tar.gz
+  cd ruby-*
+  ./configure
+  make
+  make install
+  EOS
+end
+
+script 'gem_install_rails' do
+  interpreter 'bash'
+  user 'root'
+  code 'gem install rails'
+end
+
 node[:rails][:gems].each do |pkg|
-  gem_package pkg
+  script "gem_install_#{node[:rails][:gems]}" do
+    interpreter 'bash'
+    user 'root'
+    code "gem install #{node[:rails][:gems]}"
+  end
 end
 
