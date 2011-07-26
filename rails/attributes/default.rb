@@ -11,6 +11,7 @@
 # Copyright   2011 The Board and Visitors of the University of Virginia
 # License     http://www.apache.org/licenses/LICENSE-2.0.html Apache 2 License
 
+node[:rails] ||= {}
 node[:rails][:ruby_url] = 'http://ftp.ruby-lang.org/pub/ruby/ruby-1.9-stable.tar.gz'
 node[:rails][:gems] = []
 
