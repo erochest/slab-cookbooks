@@ -204,6 +204,7 @@ if node[:omeka][:version] != nil then
   git node[:omeka][:omeka_dir] do
     repository omeka_github
     reference omeka_ref
+    enable_submodules true
     action :checkout
   end
 end
@@ -336,9 +337,11 @@ end
 # This handles a repository checkout specification (i.e., a Hash with the
 # keys :name and :url and maybe :type).
 def make_repo_task(node, base_dir, repo)
+  target = "#{base_dir}/#{repo[:name]}"
+
   case repo.fetch(:type, 'git')
   when 'svn'
-    subversion "#{base_dir}/#{repo[:name]}" do
+    subversion target do
       repository   repo[:url]
       action       :checkout
       svn_username repo.fetch(:svn_username, nil)
@@ -346,7 +349,7 @@ def make_repo_task(node, base_dir, repo)
     end
 
   when 'git'
-    git "#{base_dir}/#{repo[:name]}" do
+    git target do
       repository repo[:url]
       reference  repo.fetch(:revision, 'master')
       action     :checkout
@@ -358,17 +361,11 @@ def make_repo_task(node, base_dir, repo)
 end
 
 ## Download Themes
-default_themes.each do |theme_info|
-  make_repo_task(node, "#{node[:omeka][:omeka_dir]}/themes", theme_info)
-end
 node[:omeka][:themes].each do |theme_info|
   make_repo_task(node, "#{node[:omeka][:omeka_dir]}/themes", theme_info)
 end
 
 ## Download Plug Ins
-default_plugins.each do |plugin_info|
-  make_repo_task(node, "#{node[:omeka][:omeka_dir]}/plugins", plugin_info)
-end
 node[:omeka][:plugins].each do |plugin_info|
   make_repo_task(node, "#{node[:omeka][:omeka_dir]}/plugins", plugin_info)
 end
