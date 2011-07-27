@@ -22,8 +22,8 @@ script 'rvm' do
   code <<-EOS
   bash < <(curl -sk https://rvm.beginrescueend.com/install/rvm)
   PATH=$PATH:/usr/local/rvm/bin
-  rvm install 1.9.2
-  rvm use 1.9.2 --default
+  rvm install #{node[:rails][:ruby_version]}
+  rvm use #{node[:rails][:ruby_version]} --default
   EOS
 end
 
@@ -32,7 +32,7 @@ script 'gem_install_rails' do
   user 'root'
   code <<-EOS
   PATH=/usr/local/rvm/bin:$PATH
-  rvm install 1.9.2
+  rvm use #{node[:rails][:ruby_version]}
   gem install rails
   EOS
 end
@@ -43,8 +43,8 @@ node[:rails][:gems].each do |pkg|
     user 'root'
     code <<-EOS
     PATH=/usr/local/rvm/bin:$PATH
-    rvm install 1.9.2
-    gem install #{node[:rails][:gems]}
+    rvm use #{node[:rails][:ruby_version]}
+    gem install #{pkg}
     EOS
   end
 end
