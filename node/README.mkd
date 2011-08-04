@@ -1,0 +1,10 @@
+
+This installs Node.js from GitHub.
+
+## Attributes
+
+ * `node[:node][:giturl]` — The URL for the GitHub repository. This defaults to
+   "git://github.com/joyent/node.git".
+ * `node[:node][:tag]` — The version. This defaults to "0.5.3". This is used to
+   check out "tags/#{tag}".
+
