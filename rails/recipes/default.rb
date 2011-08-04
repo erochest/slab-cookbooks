@@ -33,7 +33,7 @@ script 'gem_install_rails' do
   code <<-EOS
   PATH=/usr/local/rvm/bin:$PATH
   rvm use #{node[:rails][:ruby_version]}
-  gem install rails
+  gem install rails #{node[:rails][:rails_gem_options]}
   EOS
 end
 
