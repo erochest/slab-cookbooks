@@ -34,3 +34,7 @@ script 'install-node' do
   EOS
 end
 
+package 'g++' do
+  action :remove
+end
+
