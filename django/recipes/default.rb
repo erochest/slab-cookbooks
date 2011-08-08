@@ -14,5 +14,7 @@ require_recipe "python"
 
 package "python-mysqldb"
 
-python_pip "Django"
+python_pip "Django" do
+  action :install
+end
 
