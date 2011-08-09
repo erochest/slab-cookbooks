@@ -1,3 +1,4 @@
+
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
 # use this file except in compliance with the License. You may obtain a copy of
 # the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by
@@ -10,21 +11,14 @@
 # Copyright   2011 The Board and Visitors of the University of Virginia
 # License     http://www.apache.org/licenses/LICENSE-2.0.html Apache 2 License
 
-maintainer       "Eric Rochester"
-maintainer_email "err8n@virginia.edu"
-license          "Apache 2.0"
-description      "Installs and configures a minimal Django installation for development."
-# long_description IO.read(File.join(File.dirname(__FILE__), 'README.mkd'))
-long_description ""
-version          "0.1.0"
+default[:django][:mysql_db]       = nil
+default[:django][:mysql_host]     = 'localhost'
+default[:django][:mysql_user]     = 'django'
+default[:django][:mysql_password] = 'django'
 
-depends "python"
+default[:django][:sqlite]         = nil
 
-# This may work with more distributions, but I've only tested it on these.
-%w{ ubuntu }.each do |os|
-  supports os
-end
+default[:django][:pips]           = []
 
-recipe "django", "Installs and configures a minimal Django installation for development."
-
+# TODO: Add settings for PostgreSQL.
 
