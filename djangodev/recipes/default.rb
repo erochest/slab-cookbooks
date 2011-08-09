@@ -18,11 +18,11 @@ python_pip "Django" do
   action :install
 end
 
-unless node[:django][:sqlite].nil?
+unless node[:djangodev][:sqlite].nil?
   # Nothing to do here, really. It is zero-config, after all.
 end
 
-unless node[:django][:mysql_db].nil?
+unless node[:djangodev][:mysql_db].nil?
   case node.platform
   when 'redhat', 'centos', 'fedora', 'suse'
     devpkg = 'mysql-devel'
@@ -39,52 +39,52 @@ unless node[:django][:mysql_db].nil?
 
   require_recipe "mysql::server"
 
-  mysql_database "user_#{node[:django][:mysql_user]}@localhost" do
-    host       node[:django][:mysql_host]
+  mysql_database "user_#{node[:djangodev][:mysql_user]}@localhost" do
+    host       node[:djangodev][:mysql_host]
     username   'root'
     password   node[:mysql][:server_root_password]
     database   'mysql'
     action     :query
-    sql        "CREATE USER '#{node[:django][:mysql_user]}'@'localhost' IDENTIFIED BY '#{node[:django][:mysql_password]}';"
+    sql        "CREATE USER '#{node[:djangodev][:mysql_user]}'@'localhost' IDENTIFIED BY '#{node[:djangodev][:mysql_password]}';"
   end
 
-  mysql_database "user_#{node[:django][:mysql_user]}" do
-    host       node[:django][:mysql_host]
+  mysql_database "user_#{node[:djangodev][:mysql_user]}" do
+    host       node[:djangodev][:mysql_host]
     username   'root'
     password   node[:mysql][:server_root_password]
     database   'mysql'
     action     :query
-    sql        "CREATE USER '#{node[:django][:mysql_user]}'@'%' IDENTIFIED BY '#{node[:django][:mysql_password]}';"
+    sql        "CREATE USER '#{node[:djangodev][:mysql_user]}'@'%' IDENTIFIED BY '#{node[:djangodev][:mysql_password]}';"
   end
 
-  mysql_database "grant_#{node[:django][:mysql_user]}@localhost" do
-    host       node[:django][:mysql_host]
+  mysql_database "grant_#{node[:djangodev][:mysql_user]}@localhost" do
+    host       node[:djangodev][:mysql_host]
     username   'root'
     password   node[:mysql][:server_root_password]
     database   'mysql'
     action     :query
-    sql        "GRANT ALL PRIVILEGES ON *.* TO '#{node[:django][:mysql_user]}'@'localhost';"
+    sql        "GRANT ALL PRIVILEGES ON *.* TO '#{node[:djangodev][:mysql_user]}'@'localhost';"
   end
 
-  mysql_database "grant_#{node[:django][:mysql_user]}" do
-    host       node[:django][:mysql_host]
+  mysql_database "grant_#{node[:djangodev][:mysql_user]}" do
+    host       node[:djangodev][:mysql_host]
     username   'root'
     password   node[:mysql][:server_root_password]
     database   'mysql'
     action     :query
-    sql        "GRANT ALL PRIVILEGES ON *.* TO '#{node[:django][:mysql_user]}'@'%';"
+    sql        "GRANT ALL PRIVILEGES ON *.* TO '#{node[:djangodev][:mysql_user]}'@'%';"
   end
 
-  mysql_database "database_#{node[:django][:mysql_db]}" do
-    host       node[:django][:mysql_host]
-    username   node[:django][:mysql_user]
-    password   node[:django][:mysql_password]
-    database   node[:django][:mysql_db]
+  mysql_database "database_#{node[:djangodev][:mysql_db]}" do
+    host       node[:djangodev][:mysql_host]
+    username   node[:djangodev][:mysql_user]
+    password   node[:djangodev][:mysql_password]
+    database   node[:djangodev][:mysql_db]
     action     :create_db
   end
 end
 
-node[:django][:pips].each do |pip|
+node[:djangodev][:pips].each do |pip|
   python_pip pip do
     action :install
   end

@@ -11,14 +11,14 @@
 # Copyright   2011 The Board and Visitors of the University of Virginia
 # License     http://www.apache.org/licenses/LICENSE-2.0.html Apache 2 License
 
-default[:django][:mysql_db]       = nil
-default[:django][:mysql_host]     = 'localhost'
-default[:django][:mysql_user]     = 'django'
-default[:django][:mysql_password] = 'django'
+default[:djangodev][:mysql_db]       = nil
+default[:djangodev][:mysql_host]     = 'localhost'
+default[:djangodev][:mysql_user]     = 'django'
+default[:djangodev][:mysql_password] = 'django'
 
-default[:django][:sqlite]         = nil
+default[:djangodev][:sqlite]         = nil
 
-default[:django][:pips]           = []
+default[:djangodev][:pips]           = []
 
 # TODO: Add settings for PostgreSQL.
 
