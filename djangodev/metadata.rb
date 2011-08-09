@@ -25,6 +25,6 @@ depends "python"
   supports os
 end
 
-recipe "django", "Installs and configures a minimal Django installation for development."
+recipe "djangodev", "Installs and configures a minimal Django installation for development."
 
 
