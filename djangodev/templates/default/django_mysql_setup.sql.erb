@@ -1,0 +1,5 @@
+
+CREATE USER '<%= node[:djangodev][:mysql_user] %>'@'%' IDENTIFIED BY '<%= node[:djangodev][:mysql_password] %>';
+GRANT ALL PRIVILEGES ON *.* TO '<%= node[:djangodev][:mysql_user] %>'@'localhost';
+GRANT ALL PRIVILEGES ON *.* TO '<%= node[:djangodev][:mysql_user] %>'@'%';
+

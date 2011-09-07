@@ -57,109 +57,14 @@ when "centos"
 end
 
 # Set up the Omeka database.
-mysql_database "create-omeka-db" do
-  host      "localhost"
-  username  "root"
-  password  node['mysql']['server_root_password']
-  database  "mysql"
-  sql       "CREATE DATABASE #{node[:omeka]['mysql_db']} CHARACTER SET = 'utf8' COLLATE = 'utf8_unicode_ci';"
-  action    :query
+template '/tmp/create_omeka_db.sql' do
+  source 'create_omeka_db.sql.erb'
+  action :create
 end
 
-mysql_database "create-omeka-test-db" do
-  host      "localhost"
-  username  "root"
-  password  node['mysql']['server_root_password']
-  database  "mysql"
-  sql       "CREATE DATABASE #{node[:omeka][:test_db]} CHARACTER SET = 'utf8' COLLATE = 'utf8_unicode_ci';"
-  action    :query
-  only_if do
-    node[:omeka][:test_db] != node[:omeka][:mysql_db]
-  end
-end
-
-mysql_database "create-omeka-user-local" do
-  host      "localhost"
-  username  "root"
-  password  node['mysql']['server_root_password']
-  database  "mysql"
-  sql       "CREATE USER '#{node[:omeka][:mysql_user]}'@'localhost' IDENTIFIED BY '#{node[:omeka][:mysql_password]}';"
-  action    :query
-end
-
-mysql_database "create-omeka-user-remote" do
-  host      "localhost"
-  username  "root"
-  password  node['mysql']['server_root_password']
-  database  "mysql"
-  sql       "CREATE USER '#{node[:omeka][:mysql_user]}'@'%' IDENTIFIED BY '#{node[:omeka][:mysql_password]}';"
-  action    :query
-end
-
-mysql_database "grant-omeka-user-local" do
-  host      "localhost"
-  username  "root"
-  password  node['mysql']['server_root_password']
-  database  "mysql"
-  sql       "GRANT ALL PRIVILEGES ON #{node[:omeka][:mysql_db]}.* TO '#{node[:omeka][:mysql_user]}'@'localhost';"
-  action    :query
-end
-
-mysql_database "grant-omeka-user-remote" do
-  host      "localhost"
-  username  "root"
-  password  node['mysql']['server_root_password']
-  database  "mysql"
-  sql       "GRANT ALL PRIVILEGES ON #{node[:omeka][:mysql_db]}.* TO '#{node[:omeka][:mysql_user]}'@'%';"
-  action    :query
-end
-
-mysql_database "create-omeka-user-local" do
-  host      "localhost"
-  username  "root"
-  password  node['mysql']['server_root_password']
-  database  "mysql"
-  sql       "CREATE USER '#{node[:omeka][:test_user]}'@'localhost' IDENTIFIED BY '#{node[:omeka][:test_password]}';"
-  action    :query
-  only_if do
-    node[:omeka][:test_user] != node[:omeka][:mysql_user]
-  end
-end
-
-mysql_database "create-omeka-user-remote" do
-  host      "localhost"
-  username  "root"
-  password  node['mysql']['server_root_password']
-  database  "mysql"
-  sql       "CREATE USER '#{node[:omeka][:test_user]}'@'%' IDENTIFIED BY '#{node[:omeka][:test_password]}';"
-  action    :query
-  only_if do
-    node[:omeka][:test_user] != node[:omeka][:mysql_user]
-  end
-end
-
-mysql_database "grant-omeka-user-local" do
-  host      "localhost"
-  username  "root"
-  password  node['mysql']['server_root_password']
-  database  "mysql"
-  sql       "GRANT ALL PRIVILEGES ON #{node[:omeka][:test_db]}.* TO '#{node[:omeka][:test_user]}'@'localhost';"
-  action    :query
-  only_if do
-    node[:omeka][:test_user] != node[:omeka][:mysql_user] or node[:omeka][:test_db] != node[:omeka][:mysql_db]
-  end
-end
-
-mysql_database "grant-omeka-user-remote" do
-  host      "localhost"
-  username  "root"
-  password  node['mysql']['server_root_password']
-  database  "mysql"
-  sql       "GRANT ALL PRIVILEGES ON #{node[:omeka][:test_db]}.* TO '#{node[:omeka][:test_user]}'@'%';"
-  action    :query
-  only_if do
-    node[:omeka][:test_user] != node[:omeka][:mysql_user] or node[:omeka][:test_db] != node[:omeka][:mysql_db]
-  end
+execute 'create-omeka-db' do
+  command "mysql -hlocalhost -uroot -p#{node[:mysql][:server_root_password]} mysql < /tmp/create_omeka_db.sql"
+  action  :run
 end
 
 ## Set up Omeka

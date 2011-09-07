@@ -39,48 +39,24 @@ unless node[:djangodev][:mysql_db].nil?
 
   require_recipe "mysql::server"
 
-  mysql_database "user_#{node[:djangodev][:mysql_user]}@localhost" do
-    host       node[:djangodev][:mysql_host]
-    username   'root'
-    password   node[:mysql][:server_root_password]
-    database   'mysql'
-    action     :query
-    sql        "CREATE USER '#{node[:djangodev][:mysql_user]}'@'localhost' IDENTIFIED BY '#{node[:djangodev][:mysql_password]}';"
+  template '/tmp/django_mysql_setup.sql' do
+    source 'django_mysql_setup.sql.erb'
+    action :create
   end
 
-  mysql_database "user_#{node[:djangodev][:mysql_user]}" do
-    host       node[:djangodev][:mysql_host]
-    username   'root'
-    password   node[:mysql][:server_root_password]
-    database   'mysql'
-    action     :query
-    sql        "CREATE USER '#{node[:djangodev][:mysql_user]}'@'%' IDENTIFIED BY '#{node[:djangodev][:mysql_password]}';"
+  execute 'django_mysql_setup' do
+    command "mysql -hlocalhost -uroot -p#{node[:mysql][:server_root_password]} mysql < /tmp/django_mysql_setup.sql"
+    action  :run
   end
 
-  mysql_database "grant_#{node[:djangodev][:mysql_user]}@localhost" do
-    host       node[:djangodev][:mysql_host]
-    username   'root'
-    password   node[:mysql][:server_root_password]
-    database   'mysql'
-    action     :query
-    sql        "GRANT ALL PRIVILEGES ON *.* TO '#{node[:djangodev][:mysql_user]}'@'localhost';"
+  template '/tmp/django_mysql_create.sql' do
+    source 'django_mysql_create.sql.erb'
+    action :create
   end
 
-  mysql_database "grant_#{node[:djangodev][:mysql_user]}" do
-    host       node[:djangodev][:mysql_host]
-    username   'root'
-    password   node[:mysql][:server_root_password]
-    database   'mysql'
-    action     :query
-    sql        "GRANT ALL PRIVILEGES ON *.* TO '#{node[:djangodev][:mysql_user]}'@'%';"
-  end
-
-  mysql_database "database_#{node[:djangodev][:mysql_db]}" do
-    host       node[:djangodev][:mysql_host]
-    username   node[:djangodev][:mysql_user]
-    password   node[:djangodev][:mysql_password]
-    database   node[:djangodev][:mysql_db]
-    action     :create_db
+  execute 'django_mysql_create' do
+    command "mysql -h#{node[:djangodev][:mysql_host]} -u#{node[:djangodev][:mysql_user]} -p#{node[:djangodev][:mysql_password]} < /tmp/django_mysql_create.sql"
+    action  :run
   end
 end
 

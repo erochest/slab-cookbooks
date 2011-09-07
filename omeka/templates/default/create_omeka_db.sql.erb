@@ -1,0 +1,22 @@
+
+-- Create Omeka DB.
+CREATE DATABASE <%= node[:omeka]['mysql_db'] %> CHARACTER SET = 'utf8' COLLATE = 'utf8_unicode_ci';
+<% if node[:omeka][:test_db] != node[:omeka][:mysql_db] %>
+  -- Create Omeka test DB.
+  CREATE DATABASE <%= node[:omeka][:test_db] %> CHARACTER SET = 'utf8' COLLATE = 'utf8_unicode_ci';
+<% end %>
+-- Create Omeka user and grant privileges.
+CREATE USER '<%= node[:omeka][:mysql_user] %>'@'localhost' IDENTIFIED BY '<%= node[:omeka][:mysql_password] %>';
+CREATE USER '<%= node[:omeka][:mysql_user] %>'@'%' IDENTIFIED BY '<%= node[:omeka][:mysql_password] %>';
+GRANT ALL PRIVILEGES ON <%= node[:omeka][:mysql_db] %>.* TO '<%= node[:omeka][:mysql_user] %>'@'localhost';
+GRANT ALL PRIVILEGES ON <%= node[:omeka][:mysql_db] %>.* TO '<%= node[:omeka][:mysql_user] %>'@'%';
+<% if node[:omeka][:test_user] != node[:omeka][:mysql_user] %>
+  -- Create Omeka test user and grant privileges.
+  CREATE USER '<%= node[:omeka][:test_user] %>'@'localhost' IDENTIFIED BY '<%= node[:omeka][:test_password] %>';
+  CREATE USER '<%= node[:omeka][:test_user] %>'@'%' IDENTIFIED BY '<%= node[:omeka][:test_password] %>';
+<% end %>
+<% if node[:omeka][:test_user] != node[:omeka][:mysql_user] or node[:omeka][:test_db] != node[:omeka][:mysql_db] %>
+  GRANT ALL PRIVILEGES ON <%= node[:omeka][:test_db] %>.* TO '<%= node[:omeka][:test_user] %>'@'localhost';
+  GRANT ALL PRIVILEGES ON <%= node[:omeka][:test_db] %>.* TO '<%= node[:omeka][:test_user] %>'@'%';
+<% end %>
+
