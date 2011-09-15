@@ -11,7 +11,15 @@
 # Copyright   2011 The Board and Visitors of the University of Virginia
 # License     http://www.apache.org/licenses/LICENSE-2.0.html Apache 2 License
 
-# require_recipe "ohai"
+# May need to update the package index first.
+case node.platform
+when "ubuntu"
+  execute 'update-package-index' do
+    command 'apt-get update'
+    user 'root'
+  end
+end
+
 require_recipe "apache2"
 require_recipe "apache2::mod_php5"
 require_recipe "apache2::mod_rewrite"
@@ -247,10 +255,12 @@ def make_repo_task(node, base_dir, repo)
   case repo.fetch(:type, 'git')
   when 'svn'
     subversion target do
-      repository   repo[:url]
-      action       :checkout
-      svn_username repo.fetch(:svn_username, nil)
-      svn_password repo.fetch(:svn_password, nil)
+      repository    repo[:url]
+      action        :checkout
+      svn_username  repo.fetch(:svn_username, nil)
+      svn_password  repo.fetch(:svn_password, nil)
+      svn_arguments " --non-interactive --trust-server-cert --no-auth-cache "
+      svn_info_args " --non-interactive --trust-server-cert --no-auth-cache "
     end
 
   when 'git'
