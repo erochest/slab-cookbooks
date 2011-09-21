@@ -28,7 +28,7 @@ script 'install-postgis' do
   code <<-EOS
   tar xfz postgis.tar.gz
   cd postgis-*
-  ./configure
+  ./configure --with-proj
   make
   make install
   EOS
