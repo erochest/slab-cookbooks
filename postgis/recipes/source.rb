@@ -11,18 +11,30 @@
 # Copyright   2011 The Board and Visitors of the University of Virginia
 # License     http://www.apache.org/licenses/LICENSE-2.0.html Apache 2 License
 
-if node.postgis.download_url.nil?
-  case node.platform
-  when 'redhat', 'centos', 'fedora', 'suse'
-    postgis = 'postgresql-postgis'                  # TODO: Just guessing here.
-  when 'debian', 'ubuntu'
-    postgis = "postgresql-#{node[:postgresql][:version]}-postgis"
-  end
+package 'proj'
+package 'libgeos-dev'
+package 'postgresql-server-dev-8.4'
 
-  package postgis
-
-else
-  include_recipe 'postgis::source'
+remote_file '/tmp/postgis.tar.gz' do
+  source node.postgis.download_url
+  action :create
 end
 
+script 'install-postgis' do
+  interpreter 'bash'
+  user 'root'
+  cwd '/tmp'
+  action :run
+  code <<-EOS
+  tar xfz postgis.tar.gz
+  cd postgis-*
+  ./configure
+  make
+  make install
+  EOS
+end
+
+service 'postgresql' do
+  action :restart
+end
 

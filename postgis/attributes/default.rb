@@ -11,4 +11,5 @@
 # Copyright   2011 The Board and Visitors of the University of Virginia
 # License     http://www.apache.org/licenses/LICENSE-2.0.html Apache 2 License
 
+default[:postgis][:download_url] = nil
 
