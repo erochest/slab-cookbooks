@@ -1,0 +1,16 @@
+<AutomatedInstallation langpack="eng">
+    <com.izforge.izpack.panels.HelloPanel/>
+    <com.izforge.izpack.panels.HTMLLicencePanel/>
+    <com.izforge.izpack.panels.TargetPanel>
+        <installpath>/usr/local/projects/geonetwork</installpath>
+    </com.izforge.izpack.panels.TargetPanel>
+    <com.izforge.izpack.panels.PacksPanel>
+        <selected>
+            <pack index="0"/>
+        </selected>
+    </com.izforge.izpack.panels.PacksPanel>
+    <com.izforge.izpack.panels.InstallPanel/>
+    <com.izforge.izpack.panels.ShortcutPanel/>
+    <com.izforge.izpack.panels.HTMLInfoPanel/>
+    <com.izforge.izpack.panels.FinishPanel/>
+</AutomatedInstallation>
