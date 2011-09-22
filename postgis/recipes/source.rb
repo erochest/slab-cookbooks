@@ -15,6 +15,10 @@ package 'proj'
 package 'libgeos-dev'
 package 'postgresql-server-dev-8.4'
 
+package 'build-essentials'
+package 'bison'
+package 'flex'
+
 remote_file '/tmp/postgis.tar.gz' do
   source node.postgis.download_url
   action :create
