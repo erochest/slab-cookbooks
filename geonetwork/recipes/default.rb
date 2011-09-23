@@ -12,6 +12,7 @@
 # License     http://www.apache.org/licenses/LICENSE-2.0.html Apache 2 License
 
 require_recipe 'java'
+require_recipe 'tomcat'
 
 remote_file '/tmp/geonetwork-installer.jar' do
   source node.geonetwork.installer_url
@@ -29,5 +30,29 @@ execute 'install-geonetwork' do
   action :run
 end
 
-# TODO: put behind tomcat 6
+script 'install-geoserver-context' do
+  interpreter 'python'
+  user 'root'
+  cwd '/tmp'
+  action :run
+  code <<-EOH
+import os
+import sys
+from xml.etree import cElementTree as ET
+tree = ET.parse('#{node.tomcat.config_dir}/server.xml')
+server = tree.getroot()
+host = server.find('Service/Engine/Host')
+context = ET.SubElement(
+    host, 'Context',
+    path='/geonetwork',
+    docBase='/usr/local/projects/geonetwork/web/geonetwork',
+    reloadable='true',
+    )
+context.tail = '\\n'
+os.rename('#{node.tomcat.config_dir}/server.xml', '#{node.tomcat.config_dir}/server.xml.bk')
+with open('#{node.tomcat.config_dir}/server.xml', 'w') as f:
+    tree.write(f)
+EOH
+  notifies :restart, resources(:service => 'tomcat')
+end
 
