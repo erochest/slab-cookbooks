@@ -11,7 +11,7 @@
 # Copyright   2011 The Board and Visitors of the University of Virginia
 # License     http://www.apache.org/licenses/LICENSE-2.0.html Apache 2 License
 
-require_recipe 'postgresql'
+require_recipe 'postgresql::server'
 
 package 'proj'
 package 'libgeos-dev'
