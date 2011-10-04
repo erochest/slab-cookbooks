@@ -25,6 +25,8 @@ default[:omeka][:test_user]      = 'omeka'
 default[:omeka][:test_password]  = 'omeka'
 default[:omeka][:test_db]        = 'omeka'
 
+default[:omeka][:phptools]       = true
+
 # * username
 default[:omeka][:username]
 # * password

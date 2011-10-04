@@ -300,92 +300,94 @@ template "#{node[:apache][:dir]}/sites-available/default" do
 end
 
 # Set up PHP packages.
-php_pear_channel "pear.php.net" do
-  action :update
-end
-
-phpunit = php_pear_channel "pear.phpunit.de" do
-  action :discover
-end
-
-php_pear_channel "components.ez.no" do
-  action :discover
-end
-
-php_pear_channel "pear.symfony-project.com" do
-  action :discover
-end
-
-phpmd = php_pear_channel "pear.phpmd.org" do
-  action :discover
-end
-
-php_pear_channel "pear.pdepend.org" do
-  action :discover
-end
-
-php_pear "PEAR" do
-  action    :upgrade
-  options   "--force"
-end
-
-php_pear "PhpDocumentor" do
-  action :install
-end
-
-php_pear "PHPUnit" do
-  channel          phpunit.channel_name
-
-  # Have to change perferred state here because XML_RPC2 now requires
-  # HTTP_Request2, which has no stable releases.
-  preferred_state  "beta"
-
-  action           :install
-end
-
-php_pear "phpcpd" do
-  channel   phpunit.channel_name
-  action    :install
-end
-
-php_pear "PHP_PMD" do
-  channel   phpmd.channel_name
-  version   "alpha"
-  action    :install
-end
-
-php_pear "PHP_CodeSniffer" do
-  version  "1.3.0"
-  action   :install
-end
-
-case node.platform
-when 'centos'
-  script "pecl/xdebug" do
-    # OMG, this seems more painful than necessary. There's no php53-* package for
-    # CentOS, and just a simple 'pecl install' doesn't work either.
-
-    interpreter "bash"
-    user "root"
-    cwd "/tmp"
-
-    code <<-EOH
-    mkdir xdebug-install
-    cd xdebug-install
-    pecl download xdebug
-    tar xfz *.tgz
-    cd $(find . -type d -and -name 'xdebug*')
-    phpize
-    ./configure
-    make
-    make install
-    echo 'zend_extension="/usr/lib/php/modules/xdebug.so"' > /etc/php.d/xdebug.ini
-    EOH
+if node.omeka.phptools
+  php_pear_channel "pear.php.net" do
+    action :update
   end
 
-when 'ubuntu'
-  package 'php5-xdebug' do
+  phpunit = php_pear_channel "pear.phpunit.de" do
+    action :discover
+  end
+
+  php_pear_channel "components.ez.no" do
+    action :discover
+  end
+
+  php_pear_channel "pear.symfony-project.com" do
+    action :discover
+  end
+
+  phpmd = php_pear_channel "pear.phpmd.org" do
+    action :discover
+  end
+
+  php_pear_channel "pear.pdepend.org" do
+    action :discover
+  end
+
+  php_pear "PEAR" do
+    action    :upgrade
+    options   "--force"
+  end
+
+  php_pear "PhpDocumentor" do
     action :install
+  end
+
+  php_pear "PHPUnit" do
+    channel          phpunit.channel_name
+
+    # Have to change perferred state here because XML_RPC2 now requires
+    # HTTP_Request2, which has no stable releases.
+    preferred_state  "beta"
+
+    action           :install
+  end
+
+  php_pear "phpcpd" do
+    channel   phpunit.channel_name
+    action    :install
+  end
+
+  php_pear "PHP_PMD" do
+    channel   phpmd.channel_name
+    version   "alpha"
+    action    :install
+  end
+
+  php_pear "PHP_CodeSniffer" do
+    version  "1.3.0"
+    action   :install
+  end
+
+  case node.platform
+  when 'centos'
+    script "pecl/xdebug" do
+      # OMG, this seems more painful than necessary. There's no php53-* package for
+      # CentOS, and just a simple 'pecl install' doesn't work either.
+
+      interpreter "bash"
+      user "root"
+      cwd "/tmp"
+
+      code <<-EOH
+      mkdir xdebug-install
+      cd xdebug-install
+      pecl download xdebug
+      tar xfz *.tgz
+      cd $(find . -type d -and -name 'xdebug*')
+      phpize
+      ./configure
+      make
+      make install
+      echo 'zend_extension="/usr/lib/php/modules/xdebug.so"' > /etc/php.d/xdebug.ini
+      EOH
+    end
+
+  when 'ubuntu'
+    package 'php5-xdebug' do
+      action :install
+    end
   end
 end
 
