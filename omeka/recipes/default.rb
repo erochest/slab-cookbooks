@@ -14,10 +14,7 @@
 # May need to update the package index first.
 case node.platform
 when "ubuntu", "debian"
-  execute 'update-apt-index' do
-    command 'apt-get update'
-    user 'root'
-  end
+  require_recipe 'apt'
 when "centos", "redhat", "fedora"
   package 'yum-utils'
   execute 'remove-elff-repos' do
