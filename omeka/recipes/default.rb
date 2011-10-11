@@ -309,6 +309,10 @@ if node.omeka.phptools
     action :discover
   end
 
+  phpdoc = php_pear_channel "http://pear.phpqatools.org/phpqatools" do
+    action :discover
+  end
+
   php_pear_channel "components.ez.no" do
     action :discover
   end
@@ -331,7 +335,8 @@ if node.omeka.phptools
   end
 
   php_pear "PhpDocumentor" do
-    action :install
+    channel phpdoc.channel_name
+    action  :install
   end
 
   php_pear "PHPUnit" do
