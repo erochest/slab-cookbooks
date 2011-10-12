@@ -309,10 +309,6 @@ if node.omeka.phptools
     action :discover
   end
 
-  phpdoc = php_pear_channel "http://pear.phpqatools.org/phpqatools" do
-    action :discover
-  end
-
   php_pear_channel "components.ez.no" do
     action :discover
   end
@@ -334,9 +330,20 @@ if node.omeka.phptools
     options   "--force"
   end
 
-  php_pear "PhpDocumentor" do
-    channel phpdoc.channel_name
-    action  :install
+#   phpunit = php_pear_channel "pear.phpqatools.org" do
+#     action :discover
+#   end
+#   php_pear "PhpDocumentor" do
+#     action  :install
+#   end
+
+  script 'install-PhpDocumentor' do
+    interpreter 'bash'
+    user        'root'
+    code <<-EOS
+    pear config-set auto_discover 1
+    pear install pear.phpqatools.org/phpqatools PHPDocumentor
+    EOS
   end
 
   php_pear "PHPUnit" do
@@ -354,11 +361,11 @@ if node.omeka.phptools
     action    :install
   end
 
-  php_pear "PHP_PMD" do
-    channel   phpmd.channel_name
-    version   "alpha"
-    action    :install
-  end
+#   php_pear "PHP_PMD" do
+#     channel   phpmd.channel_name
+#     version   "alpha"
+#     action    :install
+#   end
 
   php_pear "PHP_CodeSniffer" do
     version  "1.3.0"
