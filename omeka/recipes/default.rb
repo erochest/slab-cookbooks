@@ -35,7 +35,6 @@ require_recipe "subversion"
 
 require 'fileutils'
 
-omeka_github = 'https://github.com/omeka/Omeka.git'
 default_themes = [
   {:name => 'minimalist',     :url => 'git://github.com/omeka/theme-minimalist.git'},
   {:name => 'rhythm',         :url => 'git://github.com/omeka/theme-rhythm.git'},
@@ -119,7 +118,7 @@ if node[:omeka][:version] != nil then
   end
 
   git node[:omeka][:omeka_dir] do
-    repository omeka_github
+    repository node.omeka.git
     reference omeka_ref
     enable_submodules true
     action :checkout

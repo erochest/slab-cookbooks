@@ -12,6 +12,7 @@
 # License     http://www.apache.org/licenses/LICENSE-2.0.html Apache 2 License
 
 default[:omeka][:omeka_dir]      = '/vagrant/omeka'
+default[:omeka][:git]            = 'https://github.com/omeka/Omeka.git'
 default[:omeka][:version]        = nil
 default[:omeka][:themes]         = []
 default[:omeka][:plugins]        = []
