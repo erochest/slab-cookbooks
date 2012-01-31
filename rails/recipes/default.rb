@@ -20,7 +20,7 @@ script 'rvm' do
   interpreter 'bash'
   user 'root'
   code <<-EOS
-  bash < <(curl -sk https://rvm.beginrescueend.com/install/rvm)
+  bash -s stable < <(curl -s https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer)
   PATH=$PATH:/usr/local/rvm/bin
   rvm install #{node[:rails][:ruby_version]}
   rvm use #{node[:rails][:ruby_version]} --default
