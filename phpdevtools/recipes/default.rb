@@ -65,6 +65,7 @@ phpunit = php_pear_channel "pear.phpqatools.org" do
 end
 php_pear "PhpDocumentor" do
   action  :install
+  only_if{ node[:phpdevtools][:phpdocumentor] }
 end
 
 script 'install-PhpDocumentor' do
@@ -74,6 +75,7 @@ script 'install-PhpDocumentor' do
   pear config-set auto_discover 1
   pear install pear.phpqatools.org/phpqatools PHPDocumentor
   EOS
+  only_if{ node[:phpdevtools][:phpdocumentor] }
 end
 
 php_pear "PHPUnit" do
@@ -84,51 +86,57 @@ php_pear "PHPUnit" do
   preferred_state  "beta"
 
   action           :install
+  only_if         { node[:phpdevtools][:phpunit] }
 end
 
 php_pear "phpcpd" do
   channel   phpunit.channel_name
   action    :install
+  only_if  { node[:phpdevtools][:phpcpd] }
 end
 
 php_pear "PHP_PMD" do
   channel   phpmd.channel_name
   version   "alpha"
   action    :install
+  only_if  { node[:phpdevtools][:phppmd] }
 end
 
 php_pear "PHP_CodeSniffer" do
   version  "1.3.0"
   action   :install
+  only_if { node[:phpdevtools][:phpcs] }
 end
 
-case node.platform
-when 'centos'
-  script "pecl/xdebug" do
-    # OMG, this seems more painful than necessary. There's no php53-* package for
-    # CentOS, and just a simple 'pecl install' doesn't work either.
+if node[:phpdevtools][:xdebug]
+  case node.platform
+  when 'centos'
+    script "pecl/xdebug" do
+      # OMG, this seems more painful than necessary. There's no php53-* package for
+      # CentOS, and just a simple 'pecl install' doesn't work either.
 
-    interpreter "bash"
-    user "root"
-    cwd "/tmp"
+      interpreter "bash"
+      user "root"
+      cwd "/tmp"
 
-    code <<-EOH
-    mkdir xdebug-install
-    cd xdebug-install
-    pecl download xdebug
-    tar xfz *.tgz
-    cd $(find . -type d -and -name 'xdebug*')
-    phpize
-    ./configure
-    make
-    make install
-    echo 'zend_extension="/usr/lib/php/modules/xdebug.so"' > /etc/php.d/xdebug.ini
-    EOH
-  end
+      code <<-EOH
+      mkdir xdebug-install
+      cd xdebug-install
+      pecl download xdebug
+      tar xfz *.tgz
+      cd $(find . -type d -and -name 'xdebug*')
+      phpize
+      ./configure
+      make
+      make install
+      echo 'zend_extension="/usr/lib/php/modules/xdebug.so"' > /etc/php.d/xdebug.ini
+      EOH
+    end
 
-when 'ubuntu'
-  package 'php5-xdebug' do
-    action :install
+  when 'ubuntu'
+    package 'php5-xdebug' do
+      action :install
+    end
   end
 end
 
