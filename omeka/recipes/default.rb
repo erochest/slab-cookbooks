@@ -132,14 +132,14 @@ script "set_archive_permissions" do
   user 'root'
   cwd '/'
 
-  vm = node[:vagrant][:config][:vm]
+  # vm = node[:vagrant][:config][:vm]
   vagrant_dir = node[:vagrant][:directory]
   # TODO: Need to look up the name v-root from vm[:shared_folders] the
   # :guestpath keyed by 'v-root'.
 
   perms = []
-  perms << "uid=`id -u #{vm[:shared_folder_uid]}`" if vm[:shared_folder_uid] != nil
-  perms << "gid=`id -g #{vm[:shared_folder_gid]}`" if vm[:shared_folder_uid] != nil
+  # perms << "uid=`id -u #{vm[:shared_folder_uid]}`" if vm[:shared_folder_uid] != nil
+  # perms << "gid=`id -g #{vm[:shared_folder_gid]}`" if vm[:shared_folder_uid] != nil
   perms << 'dmode=0777'
   perms = " -o #{perms.join(",")}" if !perms.empty?
 
@@ -147,6 +147,7 @@ script "set_archive_permissions" do
   umount #{vagrant_dir}
   mount -t vboxsf#{perms} v-root #{vagrant_dir}
   EOH
+
   only_if do
     node[:instance_role] == 'vagrant'
   end

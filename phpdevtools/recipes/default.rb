@@ -95,18 +95,20 @@ php_pear "phpcpd" do
   only_if  { node[:phpdevtools][:phpcpd] }
 end
 
-php_pear "PHP_PMD" do
-  channel   phpmd.channel_name
-  version   "alpha"
-  action    :install
-  only_if  { node[:phpdevtools][:phppmd] }
-end
-
-php_pear "PHP_CodeSniffer" do
-  version  "1.3.0"
-  action   :install
-  only_if { node[:phpdevtools][:phpcs] }
-end
+# These fail saying they're already installed.
+#
+# php_pear "PHP_PMD" do
+#   channel   phpmd.channel_name
+#   version   "alpha"
+#   action    :install
+#   only_if  { node[:phpdevtools][:phppmd] }
+# end
+#
+# php_pear "PHP_CodeSniffer" do
+#   version  "1.3.0"
+#   action   :install
+#   only_if { node[:phpdevtools][:phpcs] }
+# end
 
 if node[:phpdevtools][:xdebug]
   case node.platform
