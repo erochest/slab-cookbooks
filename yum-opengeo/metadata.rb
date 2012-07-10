@@ -11,14 +11,14 @@
 # Copyright   2011 The Board and Visitors of the University of Virginia
 # License     http://www.apache.org/licenses/LICENSE-2.0.html Apache 2 License
 
-name              'geoserver'
+name              'yum-opengeo'
 version           '0.1'
-depends           %w{java tomcat}
-description       'Installs GeoServer.'
+depends           []
+description       'Installs a repostiory for yum.opengeo.org, or nothing.'
 maintainer        'Eric Rochester'
 maintainer_email  'err8n@virginia.edu'
 license           'Apache 2.0'
 
-%w{ centos }.each do |os|
+%w{ redhat centos ubuntu debian }.each do |os|
   supports os
 end

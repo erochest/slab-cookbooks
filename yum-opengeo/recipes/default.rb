@@ -11,14 +11,19 @@
 # Copyright   2011 The Board and Visitors of the University of Virginia
 # License     http://www.apache.org/licenses/LICENSE-2.0.html Apache 2 License
 
-name              'geoserver'
-version           '0.1'
-depends           %w{java tomcat}
-description       'Installs GeoServer.'
-maintainer        'Eric Rochester'
-maintainer_email  'err8n@virginia.edu'
-license           'Apache 2.0'
+case node.platform
+when 'redhat', 'centos', 'fedora', 'suse'
+  yum_key 'RPM-GPG-KEY-opengeo' do
+    url 'http://yum.opengeo.org/gpg.key'
+    action :add
+  end
 
-%w{ centos }.each do |os|
-  supports os
+  yum_repository 'opengeo' do
+    name 'OpenGeo'
+    url 'http://yum.opengeo.org/'
+    key 'RPM-GPG-KEY-opengeo'
+    action :add
+  end
+
 end
+

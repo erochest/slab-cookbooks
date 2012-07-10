@@ -12,15 +12,16 @@
 # License     http://www.apache.org/licenses/LICENSE-2.0.html Apache 2 License
 
 if node.postgis.download_url.nil?
+  require_recipe 'yum-opengeo'
+
   case node.platform
   when 'redhat', 'centos', 'fedora', 'suse'
-    postgis = 'postgresql-postgis'                  # TODO: Just guessing here.
+    postgis = 'postgis'                  # TODO: Just guessing here.
   when 'debian', 'ubuntu'
     postgis = "postgresql-#{node[:postgresql][:version]}-postgis"
   end
 
   package postgis
-
 else
   include_recipe 'postgis::source'
 end

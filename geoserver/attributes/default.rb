@@ -11,6 +11,10 @@
 # Copyright   2011 The Board and Visitors of the University of Virginia
 # License     http://www.apache.org/licenses/LICENSE-2.0.html Apache 2 License
 
-default[:geoserver][:download_url] = 'http://downloads.sourceforge.net/geoserver/geoserver-2.1.3-war.zip'
-default[:geoserver][:prefix] = 'geoserver'
+default[:geoserver][:download_url] = nil
+# 'http://downloads.sourceforge.net/geoserver/geoserver-2.1.3-war.zip'
+default[:geoserver][:prefix] = nil
+# 'geoserver'
+
+default[:geoserver][:yum] = 'opengeo-geoserver'
 

@@ -14,44 +14,49 @@
 require_recipe 'java'
 require_recipe 'tomcat'
 
-require 'uri'
+if node.geoserver.download_url.nil? then
+  require 'uri'
 
-download_uri = URI::parse(node.geoserver.download_url)
-war_filename = File.basename(download_uri.path)
+  download_uri = URI::parse(node.geoserver.download_url)
+  war_filename = File.basename(download_uri.path)
 
-# Download the file.
-remote_file "/tmp/#{war_filename}" do
-  source node.geoserver.download_url
-  action :create
-end
-
-# Unzip it (if a zip file).
-if node.geoserver.download_url.downcase.end_with?('.zip')
-  package 'unzip'
-
-  script 'unzip-geoserver-download' do
-    interpreter 'bash'
-    user 'root'
-    cwd '/tmp'
-    action :run
-    code <<-EOH
-    mkdir geoserver
-    cd geoserver
-    unzip ../#{war_filename}
-    EOH
-
-    # This is standard.
-    war_filename = 'geoserver/geoserver.war'
+  # Download the file.
+  remote_file "/tmp/#{war_filename}" do
+    source node.geoserver.download_url
+    action :create
   end
 
-end
+  # Unzip it (if a zip file).
+  if node.geoserver.download_url.downcase.end_with?('.zip')
+    package 'unzip'
 
-# Deploy the war file. At this point, /tmp/#{war_filename} should point to that
-# file.
-execute 'cp-geoserver-war' do
-  command "cp /tmp/#{war_filename} #{node.tomcat.webapp_dir}/#{node.geoserver.prefix}.war"
-  user 'root'
-  action :run
-  notifies :restart, resources(:service => "tomcat")
+    script 'unzip-geoserver-download' do
+      interpreter 'bash'
+      user 'root'
+      cwd '/tmp'
+      action :run
+      code <<-EOH
+      mkdir geoserver
+      cd geoserver
+      unzip ../#{war_filename}
+      EOH
+
+      # This is standard.
+      war_filename = 'geoserver/geoserver.war'
+    end
+
+  end
+
+  # Deploy the war file. At this point, /tmp/#{war_filename} should point to that
+  # file.
+  execute 'cp-geoserver-war' do
+    command "cp /tmp/#{war_filename} #{node.tomcat.webapp_dir}/#{node.geoserver.prefix}.war"
+    user 'root'
+    action :run
+    notifies :restart, resources(:service => "tomcat")
+  end
+else
+  require_recipe 'yum-opengeo'
+  package node.geoserver.yum
 end
 
