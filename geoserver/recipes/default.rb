@@ -14,7 +14,7 @@
 require_recipe 'java'
 require_recipe 'tomcat'
 
-if node.geoserver.download_url.nil? then
+if ! node.geoserver.download_url.nil? then
   require 'uri'
 
   download_uri = URI::parse(node.geoserver.download_url)

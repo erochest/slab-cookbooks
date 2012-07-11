@@ -13,17 +13,18 @@
 
 case node.platform
 when 'redhat', 'centos', 'fedora', 'suse'
-  yum_key 'RPM-GPG-KEY-opengeo' do
-    url 'http://yum.opengeo.org/gpg.key'
-    action :add
+  if platform?('redhat')
+    repo = 'rhel'
+  else
+    repo = node.platform
   end
+  version = node.platform_version.to_i
+  arch = node.kernel.machine =~ /x86_64/ ? "x86_64" : "i386"
 
   yum_repository 'opengeo' do
     name 'OpenGeo'
-    url 'http://yum.opengeo.org/'
-    key 'RPM-GPG-KEY-opengeo'
+    url  "http://yum.opengeo.org/#{repo}/#{version}/#{arch}/"
     action :add
   end
-
 end
 
